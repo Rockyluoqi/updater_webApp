@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html xmlns:http="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<meta name="format-detection" content="telephone=no" />
+		<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
+		<link href="css/main.css" rel="stylesheet" type="text/css" />
+    <link href="css/materialize.min.css" rel="stylesheet" type="text/css" media="screen,projection"/>
+    <!--<script type="text/javascript" src="cordova.js"></script>-->
+    <script type="text/javascript" src="js/lib/zip.js"></script>
+    <!--<script type="text/javascript" src="js/lib/yui-min.js"></script>-->
+    <script type="text/javascript" src="js/lib/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="js/lib/jquery.fileDownload.js"></script>
+    <script type="text/javascript" src="js/lib/jszip.min.js"></script>
+    <script type="text/javascript" src="js/lib/materialize.min.js"></script>
+
+    <!--<script src="http://yui.yahooapis.com/3.18.1/build/yui/yui-min.js"></script>-->
+		<title>File Transfer</title>
+	</head>
+	<body>
+		<header class="header">
+			<h1>File Transfer</h1>
+		</header>
+
+    <div class="content">
+			<div class="action-area ch30">
+				<!--<button class="button dh" id="download">Download</button>-->
+        <div style="display: inline-block;position:relative">
+          <div class="preloader-wrapper big active" id="progressBar" style="position:absolute;z-index: 10;visibility:hidden;margin-left: 860px;margin-top: 50px">
+            <div class="spinner-layer spinner-blue">
+              <div class="circle-clipper left">
+                <div class="circle"></div>
+              </div><div class="gap-patch">
+              <div class="circle"></div>
+            </div><div class="circle-clipper right">
+              <div class="circle"></div>
+            </div>
+            </div>
+
+            <div class="spinner-layer spinner-red">
+              <div class="circle-clipper left">
+                <div class="circle"></div>
+              </div><div class="gap-patch">
+              <div class="circle"></div>
+            </div><div class="circle-clipper right">
+              <div class="circle"></div>
+            </div>
+            </div>
+
+            <div class="spinner-layer spinner-yellow">
+              <div class="circle-clipper left">
+                <div class="circle"></div>
+              </div><div class="gap-patch">
+              <div class="circle"></div>
+            </div><div class="circle-clipper right">
+              <div class="circle"></div>
+            </div>
+            </div>
+
+            <div class="spinner-layer spinner-green">
+              <div class="circle-clipper left">
+                <div class="circle"></div>
+              </div><div class="gap-patch">
+              <div class="circle"></div>
+            </div><div class="circle-clipper right">
+              <div class="circle"></div>
+            </div>
+            </div>
+          </div>
+          <form name="uploadForm" id="uploadForm" method="post" enctype="multipart/form-data"
+                action="javascript: uploadAndSubmit();">
+            <a class="waves-effect waves-light btn-large blue modal-trigger tooltipped" id="download" href="#patternList" data-position="bottom" data-delay="50" data-tooltip="下载程序压缩包" >Download ZIP</a>
+            <!--<button class="button dh" id="upload">Upload</button>-->
+            <a class="waves-effect waves-light btn-large blue tooltipped" id="chooseFileBtn" data-position="bottom" data-delay="50" data-tooltip="选择文件" href="#" onclick="document.getElementById('fileID').click();return false;">choose file</a>
+            <a class="waves-effect waves-light btn-large tooltipped" id="uploadBtn" data-position="bottom" data-delay="50" data-tooltip="上传选中文件" href="#" onclick="document.getElementById('upload').click();return false;">Upload</a>
+            <input id= "fileID" type="file" accept="zip/*" name="file" style="visibility: hidden" id="uploadFile" multiple="multiple" />
+            <input id="upload" type="submit" value="Submit" style="visibility: hidden" />
+          </form>
+          <div  style="position:relative">
+            <ul class="collection with-header" id="listContainer" style="margin-top: 50px">
+              <li class="collection-header"><h4>Upload files</h4></li>
+              <!--<li class="collection-item">-->
+                <!--<div>Alvin<a href="#!" class="secondary-content">50%</a></div>-->
+              <!--</li>-->
+              <!--<li class="collection-item">-->
+                <!--<div>Alvin<a href="#!" class="secondary-content"><i class="material-icons">send</i></a></div>-->
+              <!--</li>-->
+              <!--<li class="collection-item">-->
+                <!--<div>Alvin<a href="#!" class="secondary-content"><i class="material-icons">send</i></a></div>-->
+              <!--</li>-->
+              <!--<li class="collection-item">-->
+                <!--<div>Alvin<a href="#!" class="secondary-content"><i class="material-icons">send</i></a></div>-->
+              <!--</li>-->
+            </ul>
+          </div>
+          <!--<form action="#">-->
+            <!--<div class="file-field input-field">-->
+              <!--<div class="btn">-->
+                <!--<span>File</span>-->
+                <!--<input type="file" multiple>-->
+              <!--</div>-->
+              <!--<div class="file-path-wrapper">-->
+                <!--<input class="file-path validate" type="text" placeholder="Upload one or more files">-->
+              <!--</div>-->
+            <!--</div>-->
+          <!--</form>-->
+        </div>
+
+        <div id="patternList" class="modal modal-fixed-footer">
+          <div class="modal-content">
+            <h4>Selecting robot pattern</h4>
+            <form action="#">
+              <p>
+                <input name="group1" type="radio" id="test1" />
+                <label for="test1">X1</label>
+              </p>
+              <p>
+                <input name="group1" type="radio" id="test2" />
+                <label for="test2">X3</label>
+              </p>
+              <p>
+                <input name="group1" type="radio" id="test3"  />
+                <label for="test3">X5</label>
+              </p>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <a href="#!" id="downloadSubmit" class=" modal-action modal-close waves-effect waves-green btn-flat">cancel</a>
+            <a href="#!" class=" modal-action modal-close waves-effect waves-green btn-flat" onclick="Materialize.toast('Downloading', 4000)">YES Download</a>
+          </div>
+        </div>
+
+        <!--<div>Progessing (in Bytes): <span id="bytesRead">-->
+        <!--</span> / <span id="bytesTotal"></span>-->
+        <!--</div>-->
+        <div class="result-area ch70">
+          <div class="results">
+            <div id="result" class="desc">
+              <ul class="left">
+              </ul>
+            </div>
+            <img id="downloadedImage"/>
+          </div>
+          <div class="separator"></div>
+        </div>
+      </div>
+      </div>
+    <!--<div id="uploaderContainer">-->
+      <!--<div id="selectFilesButtonContainer">-->
+      <!--</div>-->
+      <!--<div id="uploadFilesButtonContainer">-->
+        <!--<button type="button" id="uploadFilesButton"-->
+                <!--class="yui3-button" style="width:250px; height:35px;">Upload Files</button>-->
+      <!--</div>-->
+      <!--<div id="overallProgress">-->
+      <!--</div>-->
+
+      <!--<div id="filelist">-->
+        <!--<table id="filenames">-->
+          <!--<thead>-->
+          <!--<tr><th>File name</th><th>File size</th><th>Percent uploaded</th></tr>-->
+          <!--<tr id="nofiles">-->
+            <!--<td colspan="3">-->
+              <!--No files have been selected.-->
+            <!--</td>-->
+          <!--</tr>-->
+          <!--</thead>-->
+          <!--<tbody>-->
+          <!--</tbody>-->
+        <!--</table>-->
+      <!--</div>-->
+
+		<footer class="footer">
+			<div>Gaussian file manager</div>
+		</footer>
+    <script type="text/javascript" src="js/index.js"></script>
+      <!--<script type="text/javascript" src="js/download.js"></script>-->
+  </body>
+</html>
