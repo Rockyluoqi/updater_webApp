@@ -176,7 +176,7 @@ $('input[type=file]').change(function() {
           document.getElementById("bytesRead").textContent = file.size;
           // 构造 XMLHttpRequest 对象，发送文件 Binary 数据
           for(var i=0;i<files.length;i++) {
-            //use ajax
+            //or use ajax
 
             var xhr = new XMLHttpRequest();
             xhr.open(/* method */ "POST",
@@ -202,7 +202,6 @@ $('input[type=file]').change(function() {
               }
             }
           }
-
         }
       };
       reader.readAsBinaryString(file);
