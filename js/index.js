@@ -16,50 +16,86 @@
   });
 
 
-  $('.modal-trigger').leanModal();
+  //$('.modal-trigger').leanModal();
 
-//document.getElementById("download").addEventListener('click',function(e) {
-//  e.preventDefault();
-//
-//  //downloadFile('data.zip','http://192.168.1.105:8080/gs-robot/data/map_png?map_name=ssc6');
-//  downloadFile('data.zip','https://github.com/Rockyluoqi/algs4/archive/master.zip');
-//
-//  //var xhr = new XMLHttpRequest();
-//  //xhr.open("POST", baseURLDownload + "/service/report/QCPReport", true);
-//  //xhr.setRequestHeader("Content-type","application/json");
-//  //xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
-//  //xhr.onreadystatechange = function() {
-//  //  if (xhr.readyState == 4 && xhr.status == 200) {
-//  //    // alert("Failed to download:" + xhr.status + "---" + xhr.statusText);
-//  //    var blob = new Blob([xhr.response], {type: "octet/stream"});
-//  //    var fileName = "QCPReport.zip";
-//  //    saveAs(blob, fileName);
-//  //  }
-//  //}
-//  //xhr.responseType = "arraybuffer";
-//  //xhr.send(JSON.stringify(QCPParameter));
-//
-//  //$.fileDownload('http://192.168.1.105:8080/gs-robot/data/map_png?map_name=ssc6');
-//  //$.fileDownload('http://192.168.1.105:8080/gs-robot/data/map_png?map_name=ssc6',{
-//  //  successCallback: function(url) {
-//  //    alert('You just got a file download dialog or ribbon for this URL :' + url);
-//  //  },
-//  //  failCallback: function(html,url) {
-//  //    alert('Your file download just failed for this URL:' + url + '\r\n' +
-//  //      'Here was the resulting error HTML: \r\n' + html
-//  //    );
-//  //  }
-//  //});
-//});
+document.getElementById("download").addEventListener('click',function(e) {
+  e.preventDefault();
+
+  //downloadFile('data.zip','http://192.168.1.105:8080/gs-robot/data/map_png?map_name=ssc6');
+  downloadFile('data.zip','https://github.com/Rockyluoqi/algs4/archive/master.zip');
+
+  //var xhr = new XMLHttpRequest();
+  //xhr.open("POST", baseURLDownload + "/service/report/QCPReport", true);
+  //xhr.setRequestHeader("Content-type","application/json");
+  //xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+  //xhr.onreadystatechange = function() {
+  //  if (xhr.readyState == 4 && xhr.status == 200) {
+  //    // alert("Failed to download:" + xhr.status + "---" + xhr.statusText);
+  //    var blob = new Blob([xhr.response], {type: "octet/stream"});
+  //    var fileName = "QCPReport.zip";
+  //    saveAs(blob, fileName);
+  //  }
+  //}
+  //xhr.responseType = "arraybuffer";
+  //xhr.send(JSON.stringify(QCPParameter));
+
+  //$.fileDownload('http://192.168.1.105:8080/gs-robot/data/map_png?map_name=ssc6');
+  //$.fileDownload('http://192.168.1.105:8080/gs-robot/data/map_png?map_name=ssc6',{
+  //  successCallback: function(url) {
+  //    alert('You just got a file download dialog or ribbon for this URL :' + url);
+  //  },
+  //  failCallback: function(html,url) {
+  //    alert('Your file download just failed for this URL:' + url + '\r\n' +
+  //      'Here was the resulting error HTML: \r\n' + html
+  //    );
+  //  }
+  //});
+});
 //
 function downloadFile(fileName, urlData){
-  var aLink = document.createElement('a');
-  var evt = document.createEvent("HTMLEvents");
-  evt.initEvent("click");
-  aLink.download = fileName;
-  aLink.href = urlData;
-  aLink.dispatchEvent(evt);
+  //var aLink = document.createElement('a');
+  //var evt = document.createEvent("HTMLEvents");
+  //evt.initEvent("click");
+  //aLink.download = fileName;
+  //aLink.href = urlData;
+  //aLink.dispatchEvent(evt);
+  $("#progressBar").css("visibility", "visible");
+
+
+  var request = require('request'),
+      fs = require('fs'),
+      zlib = require('zlib'),
+      url = require('url');
+
+  var file_name = url.parse(urlData).pathname.split('/').pop();
+  console.log('filename: ' + file_name);
+  var out = fs.createWriteStream('./download/' + file_name);
+
+  request(urlData).pipe(out);
+
+  //$.ajax({
+  //  url:urlData,
+  //  type:'GET',
+  //  //success:function(data) {
+  //  //  //alert(data);
+  //  //
+  //  //}
+  //  success:function(data) {
+  //
+  //  },
+  //  complete: function(data) {
+  //    if(data.status === 200) {
+  //      out.write(data);
+  //      out.end();
+  //      console.log(data);
+  //    }
+  //      //data.pipe(zlib.createGunZip()).pipe(out);
+  //    $("#progressBar").css("visibility", "hidden");
+  //  }
+  //});
 }
+
+
 
 //var xhr = new XMLHttpRequest();
 //xhr.open("POST", baseURLDownload + "/service/report/QCPReport", true);
@@ -82,27 +118,29 @@ function downloadFile(fileName, urlData){
 //var $upload = $('#upload');
 //$upload.('change',onFileInputChange,false);
 
-  document.getElementById('download').addEventListener('click', function () {
-    var list = document.createElement("form");
-    list.setAttribute('action', "#");
-    for(var i=0;i<patternList.length;i++) {
-      var p = document.createElement('p');
-      var input = document.createElement('input');
-      input.setAttribute('name', 'group1');
-      input.setAttribute('type', 'radio');
-      input.setAttribute('id', 'test' + i);
-      var label = document.createElement('label');
-      label.setAttribute('for', 'test' + i);
-      label.appendChild(patternList[i]);
-      p.appendChild(input);
-      p.appendChild(label);
-    }
-  });
+  //document.getElementById('download').addEventListener('click', function () {
+  //  var list = document.createElement("form");
+  //  list.setAttribute('action', "#");
+  //  for(var i=0;i<patternList.length;i++) {
+  //    var p = document.createElement('p');
+  //    var input = document.createElement('input');
+  //    input.setAttribute('name', 'group1');
+  //    input.setAttribute('type', 'radio');
+  //    input.setAttribute('id', 'test' + i);
+  //    var label = document.createElement('label');
+  //    label.setAttribute('for', 'test' + i);
+  //    label.appendChild(patternList[i]);
+  //    p.appendChild(input);
+  //    p.appendChild(label);
+  //  }
+  //});
 
-  document.getElementById('downloadSubmit').addEventListener('click',function() {
-    var robotPattern = $('input[name="group1"]:checked').val();
-    downloadFile(robotPattern,"url"+robotPattern+".zip");
-  });
+  //document.getElementById('downloadSubmit').addEventListener('click',function() {
+  //  var robotPattern = $('input[name="group1"]:checked').val();
+  //  downloadFile(robotPattern,"url"+robotPattern+".zip");
+  //});
+
+
 
 $('input[type=file]').change(function() {
   var form = document.forms["uploadForm"];
