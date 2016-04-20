@@ -314,6 +314,32 @@ body
   margin-top: 50px;
 }
 
+#projectModule {
+    width: 200px;
+    height: 100px;
+    padding-top: 20px;
+    margin-top: 20px;
+    font-size: 25px;
+}
+
+#mapModule {
+    width: 200px;
+    height: 100px;
+    padding-top: 20px;
+    margin-left: 20px;
+    margin-top: 20px;
+    font-size: 25px;
+}
+
+#mapEditor {
+    width: 200px;
+    height: 100px;
+    padding-top: 20px;
+    margin-left: 20px;
+    margin-top: 20px;
+    font-size: 25px;
+}
+
 /*input[type=text] {*/
   /*padding:5px;*/
   /*border:2px solid #ccc;*/
