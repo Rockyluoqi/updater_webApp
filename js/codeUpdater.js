@@ -60,8 +60,24 @@ function downloadFile(fileName, urlData){
 
 //var $upload = $('#upload');
 //$upload.('change',onFileInputChange,false);
+var patternList = [];
+function getPatternList() {
+  $.ajax({
+    url:"",
+    type:"get",
+    dataType:"json",
+    success: function(data) {
+      if(data.successed) {
+        patternList.push(data);
+      }
+    }
+  });
+}
 
 document.getElementById('download').addEventListener('click', function () {
+  patternList = [];
+  getPatternList();
+
   var list = document.createElement("form");
   list.setAttribute('action', "#");
   for(var i=0;i<patternList.length;i++) {
@@ -140,13 +156,12 @@ function uploadAndSubmit() {
   if (form["file"].files.length > 0) {
 
     // 寻找表单域中的 <input type="file" ... /> 标签
-    var files = form["file"].files;
+    var files = form["file"].files[0];
 
     var formData = new FormData();
 
     for(var i=0;i<files.length;i++) {
       var file = files[i];
-
       formData.append(file.name, file);
     }
 
@@ -170,7 +185,7 @@ function uploadAndSubmit() {
     };
 
     xhr.open();
-    xhr.send(formData);
+    xhr.send(file);
 
     xhr.onreadystatechange = function () {
       if (xhr.readyState == 4) {

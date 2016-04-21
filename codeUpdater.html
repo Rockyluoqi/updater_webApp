@@ -95,8 +95,8 @@
                 <a class="waves-effect waves-light btn-large tooltipped" id="uploadBtn" data-position="bottom"
                    data-delay="50" data-tooltip="上传选中文件" href="#"
                    onclick="document.getElementById('upload').click();return false;">Upload</a>
-                <input id="fileID" type="file" accept="zip/*" name="file" style="visibility: hidden" id="uploadFile"
-                       multiple="multiple"/>
+                <input id="fileID" type="file" accept="application/x-gzip" name="file" style="visibility: hidden" id="uploadFile"/>
+                       <!--multiple="multiple"/>-->
                 <input id="upload" type="submit" value="Submit" style="visibility: hidden"/>
             </form>
             <div style="position:relative">
@@ -173,7 +173,7 @@
 <footer class="footer">
     <div>Gaussian file manager</div>
 </footer>
-<script type="text/javascript" src="js/index.js"></script>
+<script type="text/javascript" src="js/codeUpdater.js"></script>
 <!--<script type="text/javascript" src="js/download.js"></script>-->
 </body>
 </html>

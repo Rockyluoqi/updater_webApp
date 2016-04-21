@@ -106,7 +106,7 @@ $(document).ready(function() {
     }
 
     if(username.val() === "123" && password.val() === "321") {
-      location.href = "index.html";
+      location.href = "../codeUpdater.html";
     }
   });
 });/**
