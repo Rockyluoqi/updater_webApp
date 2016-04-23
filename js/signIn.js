@@ -1,7 +1,6 @@
 // button ripple effect from @ShawnSauce 's pen http://codepen.io/ShawnSauce/full/huLEH
 $(document).ready(function() {
   $(function(){
-
     var animationLibrary = 'animate';
 
     $.easing.easeOutQuart = function (x, t, b, c, d) {
@@ -104,10 +103,27 @@ $(document).ready(function() {
     } else {
       pdiv.removeAttr('errr');
     }
+      var param = {
+          email:username.val(),
+          password:password.val()
+      };
 
-    if(username.val() === "123" && password.val() === "321") {
-      location.href = "../codeUpdater.html";
-    }
+      $.ajax({
+          url:"http://rms.gs-robot.me/gs-rms-svr/customers/login",
+          type:"POST",
+          dataType:"json",
+          success:function(data) {
+              console.log(data);
+              if(data.errorCode === "") {
+                  sessionStorage.setItem("accessKey",data.data.accessKey);
+                  location.href = "../codeUpdater.html";
+              }
+          }
+      });
+
+    //if(username.val() === "123" && password.val() === "321") {
+    //  location.href = "../codeUpdater.html";
+    //}
   });
 });/**
  * Created by Luoqi on 4/14/2016.

@@ -5,9 +5,9 @@ var request = require('request'),
     fs = require('fs'),
     url = require('url');
 var restoreURL = "";
-var downloadURL="";
+var downloadURL="http://127.0.0.1:8888/downloadMap";
 var uploadURL = "";
-var getPatternListURL = "http://127.0.0.1:8888/robotPattern";
+var getPatternListURL = "http://127.0.0.1:8888/maps";
 var beginURL = "";
 var overURL = "";
 var mapListURL = "";
@@ -49,40 +49,51 @@ function downloadFile(urlData,toast){
 
     var file_name = url.parse(urlData).pathname.split('/').pop();
     console.log('filename: ' + file_name);
-    var out = fs.createWriteStream('./download/' + file_name+".tar.gz");
+    var out = fs.createWriteStream('./download/' + file_name+".zip");
 
     //check request
-    request
-        .get()
-        .on('response',function(response) {
-          if(response) {
-
-          } else {
-
-          }
-        });
+    //request
+    //    .get()
+    //    .on('response',function(response) {
+    //      if(response) {
+    //
+    //      } else {
+    //
+    //      }
+    //    });
 
     //use 'request'
-    request
-        .get(urlData)
-        .on('response', function(response) {
-            if(response.statusCode != 200) {
-                Materialize.toast(fileName+" is downloaded unsuccessfully. Because the package is incomplete.", 4000);
-            }
-            console.log(response.statusCode); // 200
-            console.log(response.complete);
-            console.log(response.headers['content-type']);
-            console.log(response.headers['content-length']);
-            var len = response.headers['content-length'];
-        })
-        .pipe(out)
-        .on('finish', function() {
-            console.log("finish.....");
-            $("#progressBar").css("visibility", "hidden");
-            Materialize.toast(file_name +toast, 4000);
-        });
+    //request
+    //    .get(urlData)
+    //    .on('response', function(response) {
+    //        if(response.statusCode != 200) {
+    //            Materialize.toast(fileName+" is downloaded unsuccessfully. Because the package is incomplete.", 4000);
+    //        }
+    //        console.log(response.statusCode); // 200
+    //        console.log(response.complete);
+    //        console.log(response.headers['content-type']);
+    //        console.log(response.headers['content-length']);
+    //        var len = response.headers['content-length'];
+    //    })
+    //    .pipe(out)
+    //    .on('finish', function() {
+    //        console.log("finish.....");
+    //        $("#progressBar").css("visibility", "hidden");
+    //        Materialize.toast(file_name +toast, 4000);
+    //    });
 
-    //use xmlhttprequest
+
+    //synchronous request version use xmlhttprequest
+    var xhr = new XMLHttpRequest();
+
+    xhr.onload = function (response) {
+        out.write(response);
+        out.end();
+    };
+
+    xhr.open("GET", urlData,false);
+    xhr.send(null);
+
     //var req = new XMLHttpRequest();
     //req.open('GET',urlData,true);
     //req.overrideMimeType ('text / plain; charset = x-user-defined');
@@ -163,9 +174,10 @@ document.getElementById('download').addEventListener('click', function () {
 document.getElementById('downloadSubmit').addEventListener('click',function() {
     var selectedMap = $('input[name="group1"]:checked');
     console.log(selectedMap.length);
-    for(let value of selectedMap) {
-        console.log(value);
-        downloadFile("" + value,' is downloaded !');
+    for(var i=0;i<selectedMap.length;i++) {
+        console.log(selectedMap[i].value);
+        //downloadFile("" + value,' is downloaded !');
+        downloadFile(downloadURL+"?mapName = "+selectedMap[i].value,' is downloaded !');
     }
     //downloadFile("url"+robotPattern+".zip",' is downloaded !');
     //downloadFile("http://127.0.0.1:8888/robot1package",' is downloaded !');
@@ -284,7 +296,6 @@ function uploadAndSubmit() {
             ////use request module
             //var senfile = fs.createReadStream(file).pipe(request.POST("URL").function);
             //request.POST("url")
-
         }
 
 
