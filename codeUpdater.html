@@ -13,8 +13,6 @@
     <!--<script>window.Hammer = require('./js/lib/hammerjs');</script>-->
     <script type="text/javascript" src="js/lib/materialize.min.js"></script>
 
-
-
     <title>File Transfer</title>
 </head>
 <body>
@@ -27,7 +25,7 @@
         <!--<button class="button dh" id="download">Download</button>-->
         <div style="display: inline-block;position:relative">
             <div class="preloader-wrapper big active" id="progressBar"
-                 style="position:absolute;z-index: 10;visibility:hidden;margin-left: 860px;margin-top: 50px">
+                 style="position:absolute;z-index: 10;visibility:hidden;margin-left: 1000px;margin-top: 50px">
                 <div class="spinner-layer spinner-blue">
                     <div class="circle-clipper left">
                         <div class="circle"></div>
@@ -78,7 +76,7 @@
             </div>
             <form name="uploadForm" id="uploadForm" method="post" enctype="multipart/form-data"
                   action="javascript: uploadAndSubmit();">
-                <a class="btn-floating btn-large waves-effect waves-light green tooltipped" id="backBtn" href="selectModule.html" data-position="right"
+                <a class="btn-floating btn-large waves-effect waves-light green tooltipped" id="backBtn" data-position="right"
                    data-delay="50" data-tooltip="返回"
                    style="margin-top: 50px;width: 60px;height:60px;left:9px;padding: 7px;">
                     <svg fill="#FFFFFF" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
@@ -88,14 +86,16 @@
                 </a>
                 <a class="waves-effect waves-light btn-large blue modal-trigger tooltipped" id="download"
                    href="#patternList" data-position="bottom" data-delay="50" data-tooltip="下载程序压缩包">Download ZIP</a>
+                <a class="waves-effect waves-light btn-large blue modal-trigger tooltipped" id="restore"
+                   href="#patternList" data-position="bottom" data-delay="50" data-tooltip="恢复原程序">Restore</a>
                 <!--<button class="button dh" id="upload">Upload</button>-->
                 <a class="waves-effect waves-light btn-large blue tooltipped" id="chooseFileBtn" data-position="bottom"
                    data-delay="50" data-tooltip="选择文件" href="#"
                    onclick="document.getElementById('fileID').click();return false;">choose file</a>
                 <a class="waves-effect waves-light btn-large tooltipped" id="uploadBtn" data-position="bottom"
                    data-delay="50" data-tooltip="上传选中文件" href="#"
-                   onclick="document.getElementById('upload').click();return false;">Upload</a>
-                <input id="fileID" type="file" accept="application/x-gzip" name="file" style="visibility: hidden" id="uploadFile"/>
+                   href="#uploadPatternList">Upload</a>
+                <input id="fileID" type="file" accept="application/zip" name="file" style="visibility: hidden" id="uploadFile"/>
                        <!--multiple="multiple"/>-->
                 <input id="upload" type="submit" value="Submit" style="visibility: hidden"/>
             </form>
@@ -130,27 +130,51 @@
         </div>
 
         <div id="patternList" class="modal modal-fixed-footer">
-            <div class="modal-content">
+            <div class="modal-content" id="list-content">
                 <h4>Selecting robot pattern</h4>
-                <form action="#">
-                    <p>
-                        <input name="group1" type="radio" id="test1"/>
-                        <label for="test1">X1</label>
-                    </p>
-                    <p>
-                        <input name="group1" type="radio" id="test2"/>
-                        <label for="test2">X3</label>
-                    </p>
-                    <p>
-                        <input name="group1" type="radio" id="test3"/>
-                        <label for="test3">X5</label>
-                    </p>
-                </form>
+                <!--<form action="#">-->
+                    <!--<p>-->
+                        <!--<input name="group1" type="radio" id="test1"/>-->
+                        <!--<label for="test1">X1</label>-->
+                    <!--</p>-->
+                    <!--<p>-->
+                        <!--<input name="group1" type="radio" id="test2"/>-->
+                        <!--<label for="test2">X3</label>-->
+                    <!--</p>-->
+                    <!--<p>-->
+                        <!--<input name="group1" type="radio" id="test3"/>-->
+                        <!--<label for="test3">X5</label>-->
+                    <!--</p>-->
+                <!--</form>-->
             </div>
             <div class="modal-footer">
-                <a href="#!" id="downloadSubmit" class=" modal-action modal-close waves-effect waves-green btn-flat">cancel</a>
-                <a href="#!" class=" modal-action modal-close waves-effect waves-green btn-flat"
+                <a href="#!" class=" modal-action modal-close waves-effect waves-green btn-flat">cancel</a>
+                <a href="#!" id="downloadSubmit" class=" modal-action modal-close waves-effect waves-green btn-flat"
                    onclick="Materialize.toast('Downloading', 4000)">YES Download</a>
+            </div>
+        </div>
+
+        <div id="uploadPatternList" class="modal modal-fixed-footer">
+            <div class="modal-content" id="upload_list_content">
+                <h4>Selecting robot pattern</h4>
+                <!--<form action="#">-->
+                <!--<p>-->
+                <!--<input name="group2" type="radio" id="test1"/>-->
+                <!--<label for="test1">X1</label>-->
+                <!--</p>-->
+                <!--<p>-->
+                <!--<input name="group2" type="radio" id="test2"/>-->
+                <!--<label for="test2">X3</label>-->
+                <!--</p>-->
+                <!--<p>-->
+                <!--<input name="group2" type="radio" id="test3"/>-->
+                <!--<label for="test3">X5</label>-->
+                <!--</p>-->
+                <!--</form>-->
+            </div>
+            <div class="modal-footer">
+                <a href="#!" class=" modal-action modal-close waves-effect waves-green btn-flat">cancel</a>
+                <a id="uploadSubmit" class=" modal-action modal-close waves-effect waves-green btn-flat">YES Upload</a>
             </div>
         </div>
 

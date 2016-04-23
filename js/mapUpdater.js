@@ -1,10 +1,17 @@
 /**
- * Created by Luoqi on 4/21/2016.
- */
-/**
  * download
  */
-
+var request = require('request'),
+    fs = require('fs'),
+    url = require('url');
+var restoreURL = "";
+var downloadURL="";
+var uploadURL = "";
+var getPatternListURL = "http://127.0.0.1:8888/robotPattern";
+var beginURL = "";
+var overURL = "";
+var mapListURL = "";
+var urlStart = "";
 $('.modal-trigger').leanModal();
 //get pattern list at the first time
 //var patternList = [];
@@ -24,7 +31,13 @@ $('.modal-trigger').leanModal();
 //  downloadFile('data.zip','https://github.com/Rockyluoqi/FlowGraph/archive/master.zip');
 //});
 //
-function downloadFile(fileName, urlData){
+
+/**
+ * ===========================================================================================
+ *                                    download project
+ * ===========================================================================================
+ */
+function downloadFile(urlData,toast){
     //var aLink = document.createElement('a');
     //var evt = document.createEvent("HTMLEvents");
     //evt.initEvent("click");
@@ -33,59 +46,138 @@ function downloadFile(fileName, urlData){
     //aLink.dispatchEvent(evt);
 
     $("#progressBar").css("visibility", "visible");
-    var request = require('request'),
-        fs = require('fs'),
-        zlib = require('zlib'),
-        url = require('url');
 
     var file_name = url.parse(urlData).pathname.split('/').pop();
     console.log('filename: ' + file_name);
-    var out = fs.createWriteStream('./download/' + file_name);
+    var out = fs.createWriteStream('./download/' + file_name+".tar.gz");
 
-    var len;
+    //check request
+    request
+        .get()
+        .on('response',function(response) {
+          if(response) {
+
+          } else {
+
+          }
+        });
+
     //use 'request'
     request
         .get(urlData)
         .on('response', function(response) {
-            console.log(response.statusCode) // 200
+            if(response.statusCode != 200) {
+                Materialize.toast(fileName+" is downloaded unsuccessfully. Because the package is incomplete.", 4000);
+            }
+            console.log(response.statusCode); // 200
             console.log(response.complete);
-            console.log(response.headers['content-type']) // 'image/png'
-            console.log(response.headers['content-length'])
+            console.log(response.headers['content-type']);
+            console.log(response.headers['content-length']);
             var len = response.headers['content-length'];
         })
         .pipe(out)
         .on('finish', function() {
             console.log("finish.....");
             $("#progressBar").css("visibility", "hidden");
-            Materialize.toast(file_name +' is downloaded !', 4000);
+            Materialize.toast(file_name +toast, 4000);
         });
+
+    //use xmlhttprequest
+    //var req = new XMLHttpRequest();
+    //req.open('GET',urlData,true);
+    //req.overrideMimeType ('text / plain; charset = x-user-defined');
+    //req.send();
 }
 
 //var $upload = $('#upload');
 //$upload.('change',onFileInputChange,false);
+/**
+ * test
+ * @type {Array}
+ */
+var patternList = [];
+function getPatternList() {
+    $.ajax({
+        url:getPatternListURL,
+        type:"get",
+        dataType:"json",
+        async:false,
+        success: function(data) {
+            patternList = data;
+        }
+    });
+}
+/**
+ * use
+ */
+//function getImageList() {
+//    $.ajax({
+//        url: urlStart + "/gs-robot/data/maps",
+//        type: "GET",
+//        dataType: "json",
+//        async: false,
+//        success: function (data) {
+//            localStorage["mapList"] = JSON.stringify(data);
+//        }
+//    });
+//}
+//
+//function parseMapList() {
+//    var mapDataArray = [];
+//    var jsonText = localStorage["mapList"];
+//    var obj = JSON.parse(jsonText);
+//    var tempArray = obj.data;
+//    for (var i = 0; i < tempArray.length; i++) {
+//        var data = tempArray[i];
+//        mapDataArray.push(data.name);
+//    }
+//    return mapDataArray;
+//}
 
 document.getElementById('download').addEventListener('click', function () {
+    patternList = [];
+    getPatternList();
+    console.log(patternList);
+
     var list = document.createElement("form");
+    var content = document.getElementById('list-content');
     list.setAttribute('action', "#");
     for(var i=0;i<patternList.length;i++) {
         var p = document.createElement('p');
         var input = document.createElement('input');
         input.setAttribute('name', 'group1');
-        input.setAttribute('type', 'radio');
+        //support multiple selection
+        input.setAttribute('type', 'checkbox');
         input.setAttribute('id', 'test' + i);
+        input.setAttribute('value',patternList[i]);
         var label = document.createElement('label');
         label.setAttribute('for', 'test' + i);
-        label.appendChild(patternList[i]);
+        label.innerText = patternList[i];
         p.appendChild(input);
         p.appendChild(label);
+        list.appendChild(p);
     }
+    content.appendChild(list);
 });
 
 document.getElementById('downloadSubmit').addEventListener('click',function() {
-    var robotPattern = $('input[name="group1"]:checked').val();
-    downloadFile(robotPattern,"url"+robotPattern+".zip");
+    var selectedMap = $('input[name="group1"]:checked');
+    console.log(selectedMap.length);
+    for(let value of selectedMap) {
+        console.log(value);
+        downloadFile("" + value,' is downloaded !');
+    }
+    //downloadFile("url"+robotPattern+".zip",' is downloaded !');
+    //downloadFile("http://127.0.0.1:8888/robot1package",' is downloaded !');
 });
 
+
+
+/**
+ * ===========================================================================================
+ *                                         Upload
+ * ===========================================================================================
+ */
 //show selected files in a list
 $('input[type=file]').change(function() {
     var form = document.forms["uploadForm"];
@@ -112,7 +204,7 @@ $('input[type=file]').change(function() {
             div.textContent = files[i].name;
             var a = document.createElement('a');
             a.setAttribute('class','secondary-content');
-            a.setAttribute('id', "progress" + i);
+            a.setAttribute('id', "progress" + (i+1));
             var a1 = document.createElement('a');
             a1.textContent = " SIZE: "+parseInt(files[i].size/1024)+"KB";
             a.textContent = "0%";
@@ -136,53 +228,65 @@ function clearList() {
 function uploadAndSubmit() {
     event.preventDefault();
     var form = document.forms["uploadForm"];
-    var fileName = $("[name='file']#fileID").val().split('\\').pop();
-    //var fileName= $("[name='file']#fileID").val();
-    console.log(fileName);
+    //var fileName = $("[name='file']#fileID").val().split('\\').pop();
+    ////var fileName= $("[name='file']#fileID").val();
+    //console.log(fileName);
     $("#progressBar").css("visibility", "visible");
     if (form["file"].files.length > 0) {
 
         // 寻找表单域中的 <input type="file" ... /> 标签
-        var files = form["file"].files[0];
-
-        var formData = new FormData();
+        var files = form["file"].files;
 
         for(var i=0;i<files.length;i++) {
-            var file = files[i];
-            formData.append(file.name, file);
+            //var formData = new FormData();
+            //
+            //for(var i=0;i<files.length;i++) {
+            //  var file = files[i];
+            //  formData.append(file.name, file);
+            //}
+            /**
+             * Edit: jQuery ajax is not able to handle binary responses properly (can't set responseType), so it's better to use a plain XMLHttpRequest call.
+             * @type {XMLHttpRequest}
+             */
+
+            var xhr = new XMLHttpRequest();
+            (xhr.upload || xhr).addEventListener('progress', function (e) {
+                var done = e.position || e.loaded;
+                var total = e.totalSize || e.total;
+                console.log('xhr progress: ' + Math.round(done / total * 100) + '%');
+
+                //example update the progress data
+                $('#progress'+(i+1)).innerText = Math.round(done / total * 100) + '%';
+            });
+            // 请求完成时建立一个处理程序。
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    // File(s) uploaded.
+                    Materialize.toast("upload success", 4000);
+                } else {
+                    alert('An error occurred!');
+                }
+            };
+
+            xhr.open("POST", "uploadURL");
+            xhr.send(files[i]);
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4) {
+                    if (xhr.status == 200) {
+                        console.log("upload complete");
+                        console.log("response: " + xhr.responseText);
+                        $("#progressBar").css("visibility", "hidden");
+                    }
+                }
+            };
+
+            ////use request module
+            //var senfile = fs.createReadStream(file).pipe(request.POST("URL").function);
+            //request.POST("url")
+
         }
 
-        var xhr = new XMLHttpRequest();
-        (xhr.upload || xhr).addEventListener('progress', function(e) {
-            var done = e.position || e.loaded;
-            var total = e.totalSize || e.total;
-            console.log('xhr progress: ' + Math.round(done/total*100) + '%');
-
-            //example update the progress data
-            $('#progress1').innerText = Math.round(done/total*100) + '%';
-        });
-        // 请求完成时建立一个处理程序。
-        xhr.onload = function () {
-            if (xhr.status === 200) {
-                // File(s) uploaded.
-                uploadButton.innerHTML = 'Upload';
-            } else {
-                alert('An error occurred!');
-            }
-        };
-
-        xhr.open();
-        xhr.send(file);
-
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState == 4) {
-                if (xhr.status == 200) {
-                    console.log("upload complete");
-                    console.log("response: " + xhr.responseText);
-                    $("#progressBar").css("visibility", "hidden");
-                }
-            }
-        };
 
         //console.log(files);
         //// try sending
