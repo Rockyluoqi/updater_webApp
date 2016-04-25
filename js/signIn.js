@@ -114,6 +114,11 @@ $(document).ready(function() {
           dataType:"json",
           success:function(data) {
               console.log(data);
+
+              var sessionExpirationTime = data.data.sessionExpirationTime;
+
+
+
               if(data.errorCode === "") {
                   sessionStorage.setItem("accessKey",data.data.accessKey);
                   location.href = "../codeUpdater.html";

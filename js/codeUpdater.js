@@ -1,17 +1,18 @@
 /**
  * download
  */
-//var request = require('request'),
-//    fs = require('fs'),
-//    url = require('url');
+var request = require('request'),
+    fs = require('fs'),
+    url = require('url'),
+    progress = require('request-progress');
 
-var restoreURL = "http://192.168.1.88:6789/gs-robot/system/rollback";
-var downloadURL = "http://download.gs-robot.me/system_deploy_package/";
+var restoreURL = "http://192.168.1.107:6789/gs-robot/system/rollback";
+var downloadURL = "http://download.gs-robot.me/system_package/";
 var uploadURL = "http://192.168.1.107:6789/gs-robot/system/update_system/";
 var getPatternListURL = "http://127.0.0.1:8888/robotPattern";
 var beginURL = "http://192.168.1.107:5678/gs-robot/cmd/start_system_updater";
 var overURL = "http://192.168.1.107:5678/gs-robot/cmd/stop_system_updater";
-var getUpdatePathURL = "http://rms.gs-robot.me/gs-updater-svr/system_deploy_packages/";
+var getUpdatePathURL = "http://rms.gs-robot.me/gs-rms-svr/system_packages/";
 
 $('.modal-trigger').leanModal();
 //get pattern list at the first time
@@ -51,21 +52,75 @@ function downloadFile(urlData, toast) {
     var out = fs.createWriteStream('./download/' + file_name);
 
     //use 'request'
-    request
-        .get(urlData)
-        .on('response', function (response) {
-            console.log(response.statusCode); // 200
-            console.log(response.complete);
-            console.log(response.headers['content-type']);
-            console.log(response.headers['content-length']);
-            var len = response.headers['content-length'];
+    //request
+    //    .get(urlData)
+    //    .on('response', function (response) {
+    //        console.log(response.statusCode); // 200
+    //        console.log(response.complete);
+    //        console.log(response.headers['content-type']);
+    //        console.log(response.headers['content-length']);
+    //        var len = response.headers['content-length'];
+    //    })
+    //    .pipe(out)
+    //    .on('finish', function () {
+    //        console.log("finish.....");
+    //        $("#progressBar").css("visibility", "hidden");
+    //        Materialize.toast(file_name + toast, 4000);
+    //    });
+
+    //use request and request-module
+    // The options argument is optional so you can omit it
+    progress(request(urlData), {
+        throttle: 1000,                    // Throttle the progress event to 2000ms, defaults to 1000ms
+        delay: 1000,                       // Only start to emit after 1000ms delay, defaults to 0ms
+        lengthHeader: 'content-length'  // Length header to use, defaults to content-length
+    })
+        .on('progress', function (state) {
+            // The state is an object that looks like this:
+            // {
+            //     percentage: 0.5,            // Overall percentage (between 0 to 1)
+            //     speed: 554732,              // The download speed in bytes/sec
+            //     size: {
+            //         total: 90044871,        // The total payload size in bytes
+            //         transferred: 27610959   // The transferred payload size in bytes
+            //     },
+            //     time: {
+            //         elapsed: 36.235,        // The total elapsed seconds since the start (3 decimals)
+            //         remaining: 81.403       // The remaining seconds to finish (3 decimals)
+            //     }
+            // }
+            //console.log('progress', state);
+            document.getElementById('downloadProgress1').innerText = toDecimal2(state.percentage*100) + "%" + "  Speed: " + parseInt(state.speed/1024) +" KB/s";
         })
-        .pipe(out)
-        .on('finish', function () {
+        .on('error', function (err) {
+            // Do something with err
+        })
+        .on('end', function () {
+            // Do something after request finishes
             console.log("finish.....");
             $("#progressBar").css("visibility", "hidden");
             Materialize.toast(file_name + toast, 4000);
-        });
+        })
+        .pipe(out);
+}
+
+//to decimal, save 2 digits
+function toDecimal2(x) {
+    var f = parseFloat(x);
+    if (isNaN(f)) {
+        return false;
+    }
+    var f = Math.round(x*100)/100;
+    var s = f.toString();
+    var rs = s.indexOf('.');
+    if (rs < 0) {
+        rs = s.length;
+        s += '.';
+    }
+    while (s.length <= rs + 2) {
+        s += '0';
+    }
+    return s;
 }
 
 //var $upload = $('#upload');
@@ -84,8 +139,10 @@ function getPatternList() {
 }
 
 document.getElementById('download').addEventListener('click', function () {
-    patternList = [];
-    getPatternList();
+    //test
+    patternList = ["GS-AS-01","GS-SR-01"];
+    //patternList = [];
+    //getPatternList();
     console.log(patternList);
 
     var list = document.createElement("form");
@@ -116,26 +173,71 @@ document.getElementById('download').addEventListener('click', function () {
 document.getElementById('downloadSubmit').addEventListener('click', function () {
     $("#progressBar").css("visibility", "visible");
     var robotPattern = $('input[name="group1"]:checked');
+    var currentPattern = robotPattern[0].value;
 
-    var options = {
-        url:getUpdatePathURL + robotPattern + "/latest",
-        headers: {
-            desktop_web_access_key: sessionStorage.getItem("accessKey"),
-            client_type: "DESKTOP_WEB"
+    var xhr = new XMLHttpRequest();
+
+    xhr.onload = function () {
+        var object = JSON.parse(xhr.response);
+        console.log(object);
+        if (object.msg === "successed") {
+            Materialize.toast("Get UpdatePath successfully.", 4000);
+
+            var ul = document.getElementById('listContainer');
+            clearList();
+            var li_1 = document.createElement('li');
+            li_1.setAttribute('class', 'collection-item');
+            var h = document.createElement('h5');
+            h.innerText = "Downloading";
+            li_1.appendChild(h);
+            ul.appendChild(li_1);
+            var li = document.createElement('li');
+            li.setAttribute('class', 'collection-item');
+            var div = document.createElement('div');
+            div.setAttribute('id', 'list0');
+            //div.textContent = files[i].name;
+            div.textContent = object.data.pkg_file_url;
+            var a = document.createElement('a');
+            a.setAttribute('class', 'secondary-content');
+            a.setAttribute('id', "downloadProgress1");
+            var a1 = document.createElement('a');
+            //a1.textContent = " SIZE: " + parseInt(files[i].size / 1024) + "KB";
+            a.textContent = "0%";
+            div.appendChild(a);
+            div.appendChild(a1);
+            li.appendChild(div);
+            ul.appendChild(li);
+
+            downloadFile(downloadURL + object.data.pkg_file_url, ' is downloaded !');
+        } else {
+            $("#progressBar").css("visibility", "hidden");
+            Materialize.toast("Oops... Get UpdatePath unsuccessfully.", 4000);
         }
     };
 
-    console.log(options.headers.client_type);
-
-    request.get(options,function(e,r,body) {
-        var object = JSON.parse(body);
-        if (object.msg === "successed") {
-            Materialize.toast("Get UpdatePath successfully.", 4000);
-            downloadFile(downloadURL + data.pkg_file_url, ' is downloaded !');
-        } else {
-            Materialize.toast("Oops... Get UpdatePath unsuccessfully.", 4000);
-        }
-    });
+    xhr.open("GET",getUpdatePathURL + currentPattern + "/latest");
+    xhr.setRequestHeader("desktop_web_access_key",sessionStorage.getItem("accessKey"));
+    xhr.setRequestHeader("client_type","DESKTOP_WEB");
+    xhr.send(null);
+    //var options = {
+    //    url:getUpdatePathURL + robotPattern + "/latest",
+    //    headers: {
+    //        desktop_web_access_key: sessionStorage.getItem("accessKey"),
+    //        client_type: "DESKTOP_WEB"
+    //    }
+    //};
+    //
+    //console.log(options.headers.client_type);
+    //
+    //request.get(options,function(e,r,body) {
+    //    var object = JSON.parse(body);
+    //    if (object.msg === "successed") {
+    //        Materialize.toast("Get UpdatePath successfully.", 4000);
+    //        downloadFile(downloadURL + data.pkg_file_url, ' is downloaded !');
+    //    } else {
+    //        Materialize.toast("Oops... Get UpdatePath unsuccessfully.", 4000);
+    //    }
+    //});
     //downloadFile("http://127.0.0.1:8888/robot1package",' is downloaded !');
 });
 
@@ -144,18 +246,26 @@ document.getElementById('downloadSubmit').addEventListener('click', function () 
  *                                 restore the last version
  * ===========================================================================================
  */
-document.getElementById('restore').addEventListener('add', function () {
-
-    $.ajax({
-        url: restoreURL,
-        type: "POST",
-        success: function (data) {
-            if(data.successed) {
-                Materialize.toast("Rollback successfully!", 4000);
-            } else {
-                Materialize.toast("Oops... Rollback unsuccessfully!", 4000);
-            }
-        }
+document.getElementById('restore').addEventListener('click', function () {
+    $("#progressBar").css("visibility", "visible");
+    request.post({url:beginURL},function(err,httpResponse,body) {
+        setTimeout(function () {
+            $.ajax({
+                url: restoreURL,
+                type: "GET",
+                success: function (data) {
+                    console.log(data);
+                    var object = JSON.parse(data);
+                    if (object.successed) {
+                        $("#progressBar").css("visibility", "hidden");
+                        Materialize.toast("Rollback successfully!", 4000);
+                    } else {
+                        $("#progressBar").css("visibility", "hidden");
+                        Materialize.toast("Oops... Rollback unsuccessfully!", 4000);
+                    }
+                }
+            });
+        },3000);
     });
 
     ////删除目录下的所有文件
@@ -252,6 +362,7 @@ function uploadSelectPattern() {
         input.setAttribute('name', 'group2');
         input.setAttribute('type', 'radio');
         input.setAttribute('id', 'test' + i);
+        input.setAttribute('value',patternList[i]);
         var label = document.createElement('label');
         label.setAttribute('for', 'test' + i);
         label.innerText = patternList[i];
@@ -305,8 +416,8 @@ function uploadAndSubmit() {
                         var total = e.totalSize || e.total;
                         console.log('xhr progress: ' + Math.round(done / total * 100) + '%');
                         //example update the progress data
-                        $('#progress1').innerText = Math.round(done / total * 100) + '%';
-                        //document.getElementById('progress1').innerText
+                        //$('#progress1').innerText = Math.round(done / total * 100) + '%';
+                        document.getElementById('progress1').innerText = Math.round(done / total * 100) + '%';
                     });
                     // 请求完成时建立一个处理程序。
                     xhr.onload = function () {
@@ -320,7 +431,7 @@ function uploadAndSubmit() {
                         }
                     };
 
-                    xhr.open("POST", uploadURL + file.name, false);
+                    xhr.open("POST", uploadURL + file.name);
                     xhr.send(file);
                 } else {
                     alert("Please choose a file.");
@@ -479,14 +590,13 @@ function uploadAndSubmit() {
  *                                         Go back
  * ===========================================================================================
  */
-document.getElementById('backBtn').addEventListener('click', function () {
+function back() {
     console.log("back");
     $.ajax({
         url: overURL,
         type: "POST",
-        async: false,
         success: function (data) {
         }
     });
-    //location.href = "selectModule.html";
-});
+    location.href = "selectModule.html";
+}

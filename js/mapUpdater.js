@@ -3,11 +3,13 @@
  */
 var request = require('request'),
     fs = require('fs'),
-    url = require('url');
+    url = require('url'),
+    http = require('http');
 var restoreURL = "";
-var downloadURL="http://127.0.0.1:8888/downloadMap";
-var uploadURL = "";
-var getPatternListURL = "http://127.0.0.1:8888/maps";
+//var downloadURL="http://127.0.0.1:8888/downloadMap";
+var downloadURL="http://192.168.1.105:8088/gs-robot/data/download_map";
+var uploadURL = "http://192.168.1.105:8088/gs-robot/data/upload_map";
+var getMapListURL = "http://192.168.1.105:8080/gs-robot/data/maps";
 var beginURL = "";
 var overURL = "";
 var mapListURL = "";
@@ -37,7 +39,7 @@ $('.modal-trigger').leanModal();
  *                                    download project
  * ===========================================================================================
  */
-function downloadFile(urlData,toast){
+function downloadFile(urlData,fileName,toast){
     //var aLink = document.createElement('a');
     //var evt = document.createEvent("HTMLEvents");
     //evt.initEvent("click");
@@ -47,57 +49,33 @@ function downloadFile(urlData,toast){
 
     $("#progressBar").css("visibility", "visible");
 
-    var file_name = url.parse(urlData).pathname.split('/').pop();
-    console.log('filename: ' + file_name);
-    var out = fs.createWriteStream('./download/' + file_name+".zip");
+    //var file_name = url.parse(urlData).pathname.split('/').pop();
+    //console.log('filename: ' + file_name);
+    var out = fs.createWriteStream('./download/' + fileName+".tar.gz");
 
-    //check request
-    //request
-    //    .get()
-    //    .on('response',function(response) {
-    //      if(response) {
-    //
-    //      } else {
-    //
-    //      }
-    //    });
+    console.log(urlData);
 
-    //use 'request'
-    //request
-    //    .get(urlData)
-    //    .on('response', function(response) {
-    //        if(response.statusCode != 200) {
-    //            Materialize.toast(fileName+" is downloaded unsuccessfully. Because the package is incomplete.", 4000);
-    //        }
-    //        console.log(response.statusCode); // 200
-    //        console.log(response.complete);
-    //        console.log(response.headers['content-type']);
-    //        console.log(response.headers['content-length']);
-    //        var len = response.headers['content-length'];
-    //    })
-    //    .pipe(out)
-    //    .on('finish', function() {
-    //        console.log("finish.....");
-    //        $("#progressBar").css("visibility", "hidden");
-    //        Materialize.toast(file_name +toast, 4000);
-    //    });
-
-
-    //synchronous request version use xmlhttprequest
-    var xhr = new XMLHttpRequest();
-
-    xhr.onload = function (response) {
-        out.write(response);
-        out.end();
+    //use nodejs http module
+    var options = {
+        hostname:'192.168.1.105',
+        port:8088,
+        path: "/gs-robot/data/download_map?map_name="+file_name,
+        headers: {
+            //need this header
+            'Connection':'keep-alive'
+        }
     };
 
-    xhr.open("GET", urlData,false);
-    xhr.send(null);
-
-    //var req = new XMLHttpRequest();
-    //req.open('GET',urlData,true);
-    //req.overrideMimeType ('text / plain; charset = x-user-defined');
-    //req.send();
+    http.get(options,function(res){
+        res.on('data',function(data) {
+            console.log(data);
+            out.write(data);
+        }).on('end',function() {
+            out.end();
+            $("#progressBar").css("visibility", "hidden");
+            Materialize.toast(file_name +toast, 4000);
+        });
+    });
 }
 
 //var $upload = $('#upload');
@@ -106,52 +84,58 @@ function downloadFile(urlData,toast){
  * test
  * @type {Array}
  */
-var patternList = [];
-function getPatternList() {
-    $.ajax({
-        url:getPatternListURL,
-        type:"get",
-        dataType:"json",
-        async:false,
-        success: function(data) {
-            patternList = data;
-        }
-    });
-}
-/**
- * use
- */
-//function getImageList() {
+//var patternList = [];
+//function getPatternList() {
 //    $.ajax({
-//        url: urlStart + "/gs-robot/data/maps",
-//        type: "GET",
-//        dataType: "json",
-//        async: false,
-//        success: function (data) {
-//            localStorage["mapList"] = JSON.stringify(data);
+//        url:,
+//        type:"get",
+//        dataType:"json",
+//        async:false,
+//        success: function(data) {
+//            patternList = data;
 //        }
 //    });
 //}
-//
-//function parseMapList() {
-//    var mapDataArray = [];
-//    var jsonText = localStorage["mapList"];
-//    var obj = JSON.parse(jsonText);
-//    var tempArray = obj.data;
-//    for (var i = 0; i < tempArray.length; i++) {
-//        var data = tempArray[i];
-//        mapDataArray.push(data.name);
-//    }
-//    return mapDataArray;
-//}
+/**
+ * use
+ */
+function getImageList() {
+    $.ajax({
+        url: getMapListURL,
+        type: "GET",
+        dataType: "json",
+        async: false,
+        success: function (data) {
+            //console.log(data);
+            localStorage["mapList"] = JSON.stringify(data);
+        }
+    });
+}
 
+function parseMapList() {
+    var mapDataArray = [];
+    var jsonText = localStorage["mapList"];
+    var obj = JSON.parse(jsonText);
+    var tempArray = obj.data;
+    for (var i = 0; i < tempArray.length; i++) {
+        var data = tempArray[i];
+        mapDataArray.push(data.name);
+    }
+    return mapDataArray;
+}
+var patternList = [];
 document.getElementById('download').addEventListener('click', function () {
+    getImageList();
     patternList = [];
-    getPatternList();
+    patternList = parseMapList();
+    //getPatternList();
     console.log(patternList);
 
     var list = document.createElement("form");
     var content = document.getElementById('list-content');
+    var h = document.createElement("h4");
+    h.innerText = "Select map";
+    content.appendChild(h);
     list.setAttribute('action', "#");
     for(var i=0;i<patternList.length;i++) {
         var p = document.createElement('p');
@@ -172,12 +156,13 @@ document.getElementById('download').addEventListener('click', function () {
 });
 
 document.getElementById('downloadSubmit').addEventListener('click',function() {
+    $("#progressBar").css("visibility", "visible");
     var selectedMap = $('input[name="group1"]:checked');
     console.log(selectedMap.length);
     for(var i=0;i<selectedMap.length;i++) {
         console.log(selectedMap[i].value);
         //downloadFile("" + value,' is downloaded !');
-        downloadFile(downloadURL+"?mapName = "+selectedMap[i].value,' is downloaded !');
+        downloadFile(downloadURL+"?mapName = "+selectedMap[i].value, selectedMap[i].value, ' is downloaded !');
     }
     //downloadFile("url"+robotPattern+".zip",' is downloaded !');
     //downloadFile("http://127.0.0.1:8888/robot1package",' is downloaded !');
@@ -260,38 +245,17 @@ function uploadAndSubmit() {
              * Edit: jQuery ajax is not able to handle binary responses properly (can't set responseType), so it's better to use a plain XMLHttpRequest call.
              * @type {XMLHttpRequest}
              */
+            upload(files[i],i);
 
-            var xhr = new XMLHttpRequest();
-            (xhr.upload || xhr).addEventListener('progress', function (e) {
-                var done = e.position || e.loaded;
-                var total = e.totalSize || e.total;
-                console.log('xhr progress: ' + Math.round(done / total * 100) + '%');
-
-                //example update the progress data
-                $('#progress'+(i+1)).innerText = Math.round(done / total * 100) + '%';
-            });
-            // 请求完成时建立一个处理程序。
-            xhr.onload = function () {
-                if (xhr.status === 200) {
-                    // File(s) uploaded.
-                    Materialize.toast("upload success", 4000);
-                } else {
-                    alert('An error occurred!');
-                }
-            };
-
-            xhr.open("POST", "uploadURL");
-            xhr.send(files[i]);
-
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState == 4) {
-                    if (xhr.status == 200) {
-                        console.log("upload complete");
-                        console.log("response: " + xhr.responseText);
-                        $("#progressBar").css("visibility", "hidden");
-                    }
-                }
-            };
+            //xhr.onreadystatechange = function () {
+            //    if (xhr.readyState == 4) {
+            //        if (xhr.status == 200) {
+            //            console.log("upload complete");
+            //            console.log("response: " + xhr.responseText);
+            //            $("#progressBar").css("visibility", "hidden");
+            //        }
+            //    }
+            //};
 
             ////use request module
             //var senfile = fs.createReadStream(file).pipe(request.POST("URL").function);
@@ -365,4 +329,38 @@ function uploadAndSubmit() {
         $("#uploadBtn").css("background-color", "#DFDFDF");
         $("#uploadBtn").css("color", "#9F9F9F");
     }
+}
+
+function upload(file,i) {
+    var xhr = new XMLHttpRequest();
+    (xhr.upload || xhr).addEventListener('progress', function (e) {
+        var done = e.position || e.loaded;
+        var total = e.totalSize || e.total;
+        console.log('xhr progress: ' + Math.round(done / total * 100) + '%');
+        //example update the progress data
+        document.getElementById('progress'+(i+1)).innerText = Math.round(done / total * 100) + '%';
+    });
+    // 请求完成时建立一个处理程序
+    xhr.onload = function () {
+        console.log("response" + xhr.response);
+        var object = JSON.parse(xhr.response);
+        if (object.successed) {
+            // File(s) uploaded.
+            Materialize.toast("Upload successfully!", 4000);
+            $("#progressBar").css("visibility", "hidden");
+        } else {
+            Materialize.toast("Upload unsuccessfully!", 4000);
+            $("#progressBar").css("visibility", "hidden");
+        }
+    };
+
+    var fileName = file.name.split(".")[0];
+    console.log("fileName:"+files[i].name+" "+fileName);
+    xhr.open("POST", uploadURL+"?map_name="+fileName);
+    xhr.send(file);
+}
+
+function back() {
+    console.log("back");
+    location.href = "selectModule.html";
 }

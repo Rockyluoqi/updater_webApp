@@ -7,10 +7,10 @@
           content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width"/>
     <link href="css/main.css" rel="stylesheet" type="text/css"/>
     <link href="css/materialize.min.css" rel="stylesheet" type="text/css" media="screen,projection"/>
-    <script type="text/javascript" src="js/lib/jquery-1.12.3.min.js"></script>
+    <!--<script type="text/javascript" src="js/lib/jquery-1.12.3.min.js"></script>-->
     <!--For electron-->
-    <!--<script>window.$ = window.jQuery = require('./js/lib/jquery-1.11.0.min.js');</script>-->
-    <!--<script>window.Hammer = require('./js/lib/hammerjs');</script>-->
+    <script>window.$ = window.jQuery = require('./js/lib/jquery-1.11.0.min.js');</script>
+    <script>window.Hammer = require('./js/lib/hammerjs');</script>
     <script type="text/javascript" src="js/lib/materialize.min.js"></script>
 
     <title>Map Transfer</title>
@@ -25,7 +25,7 @@
         <!--<button class="button dh" id="download">Download</button>-->
         <div style="display: inline-block;position:relative">
             <div class="preloader-wrapper big active" id="progressBar"
-                 style="position:absolute;z-index: 10;visibility:hidden;margin-left: 1000px;margin-top: 50px">
+                 style="position:absolute;z-index: 10;visibility:hidden;margin-left: 950px;margin-top: 50px">
                 <div class="spinner-layer spinner-blue">
                     <div class="circle-clipper left">
                         <div class="circle"></div>
@@ -76,7 +76,7 @@
             </div>
             <form name="uploadForm" id="uploadForm" method="post" enctype="multipart/form-data"
                   action="javascript: uploadAndSubmit();">
-                <a class="btn-floating btn-large waves-effect waves-light green tooltipped" id="backBtn" data-position="right"
+                <a class="btn-floating btn-large waves-effect waves-light green tooltipped" id="backBtn" onclick="back()" data-position="right"
                    data-delay="50" data-tooltip="返回"
                    style="margin-top: 50px;width: 60px;height:60px;left:9px;padding: 7px;">
                     <svg fill="#FFFFFF" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
@@ -84,24 +84,21 @@
                         <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
                     </svg>
                 </a>
-                <a class="waves-effect waves-light btn-large blue modal-trigger tooltipped" id="download"
-                   href="#patternList" data-position="bottom" data-delay="50" data-tooltip="下载图片压缩包">Download ZIP</a>
-                <a class="waves-effect waves-light btn-large blue modal-trigger tooltipped" id="restore"
-                   href="#patternList" data-position="bottom" data-delay="50" data-tooltip="恢复原程序">Restore</a>
+                <a class="waves-effect waves-light btn-large green modal-trigger tooltipped" id="download"
+                   href="#patternList" data-position="bottom" data-delay="50" data-tooltip="下载地图包">Download Maps</a>
                 <!--<button class="button dh" id="upload">Upload</button>-->
                 <a class="waves-effect waves-light btn-large blue tooltipped" id="chooseFileBtn" data-position="bottom"
                    data-delay="50" data-tooltip="选择文件" href="#"
-                   onclick="document.getElementById('fileID').click();return false;">choose file</a>
+                   onclick="document.getElementById('fileID').click();return false;">choose maps</a>
                 <a class="waves-effect waves-light btn-large tooltipped" id="uploadBtn" data-position="bottom"
                    data-delay="50" data-tooltip="上传选中文件" href="#"
-                   onclick="document.getElementById('upload').click();return false;">Upload</a>
-                <input id="fileID" type="file" accept="application/zip" name="file" style="visibility: hidden" id="uploadFile"
-                multiple="multiple"/>
+                   onclick="document.getElementById('upload').click();return false;">push & update</a>
+                <input id="fileID" type="file" accept="application/tar.gz" name="file" style="visibility: hidden" id="uploadFile"
+                       multiple="multiple"/>
                 <input id="upload" type="submit" value="Submit" style="visibility: hidden"/>
             </form>
             <div style="position:relative">
                 <ul class="collection with-header" id="listContainer" style="margin-top: 50px">
-                    <li class="collection-header"><h5>Upload file list</h5></li>
                     <!--<li class="collection-item">-->
                     <!--<div>Alvin<a href="#!" class="secondary-content">50%</a></div>-->
                     <!--</li>-->
