@@ -10,14 +10,44 @@
     },
     "GS-SR-01":{
       @孙世超 使用时填写
+    }，
+    "GS-RR-01":{
+
     }
   }
+## 登陆
+### url
+    rms.gs-robot.me/gs-rms-svr/customers/login POST
+### param
+    {
+      "email":"twx@123.com",
+      "password":"123"
+    }
+### response
+    {
+      "errorCode":"",
+      "msg":"",
+      "data":{
+            "accessKey": "56bf7fb3-09a2-4540-8190-c6f164235295",
+            "context": {
+              "created_at": "2015-12-28 10:12:53.000",
+              "customer_id": 1,
+              "email": "twx@123.com",
+              "id": 1
+            },
+            "requestType": "DESKTOP_WEB"
+          }
+    }
+
 ## 获取更新包路径(后台)
 ### url
-    rms.gs-robot.me/gs-updater-srv/system_deploy_packages/:robotModelType/:version GET
+    rms.gs-robot.me/gs-updater-svr/system_deploy_packages/:robotModelType/:version GET
 ### param
     :robotModelType 扫地机：GS-AS-01 送餐车：？？？ 服务机器人：？？？
-    ：version 最新：latest 指定版本：1.0.0
+    :version 最新：latest 指定版本：1.0.0
+### header
+    desktop_web_access_key: 登陆接口返回的 accessKey
+    client_type: DESKTOP_WEB
 ### response
     {
       "errorCode":"",
@@ -76,7 +106,7 @@
 
 ## 回滚到上一个版本(机器)
 ### url
-    192.168.1.88:6789/gs-robot/system/rollback
+    192.168.1.88:6789/gs-robot/system/rollback GET
 ### response
     {
       "successed":true,

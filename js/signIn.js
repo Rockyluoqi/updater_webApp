@@ -112,7 +112,7 @@ $(document).ready(function() {
           url:"http://rms.gs-robot.me/gs-rms-svr/customers/login",
           type:"POST",
           dataType:"json",
-          data: param,
+          data: JSON.stringify(param),
           success:function(data) {
               console.log(data);
               var sessionExpirationTime = data.data.sessionExpirationTime;
