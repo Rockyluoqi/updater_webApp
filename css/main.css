@@ -319,29 +319,29 @@ font-size:14px;
 }
 
 #projectModule {
-    width: 200px;
+    width: 400px;
     height: 100px;
     padding-top: 20px;
     margin-top: 20px;
-    font-size: 25px;
+    font-size: 20px;
 }
 
 #mapModule {
-    width: 200px;
+    width: 400px;
     height: 100px;
     padding-top: 20px;
     margin-left: 20px;
     margin-top: 20px;
-    font-size: 25px;
+    font-size: 20px;
 }
 
 #mapEditor {
-    width: 200px;
+    width: 400px;
     height: 100px;
     padding-top: 20px;
     margin-left: 20px;
     margin-top: 20px;
-    font-size: 25px;
+    font-size: 20px;
 }
 
 .page-header {

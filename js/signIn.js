@@ -119,7 +119,7 @@ $(document).ready(function() {
 
               if(data.errorCode === "") {
                   sessionStorage.setItem("accessKey",data.data.accessKey);
-                  location.href = "../codeUpdater.html";
+                  location.href = "selectModule.html";
               }
           }
       });

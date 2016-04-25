@@ -6,12 +6,12 @@ var request = require('request'),
     url = require('url'),
     progress = require('request-progress');
 
-var restoreURL = "http://192.168.1.107:6789/gs-robot/system/rollback";
+var restoreURL = "http://192.168.1.88:6789/gs-robot/system/rollback";
 var downloadURL = "http://download.gs-robot.me/system_package/";
-var uploadURL = "http://192.168.1.107:6789/gs-robot/system/update_system/";
+var uploadURL = "http://192.168.1.88:6789/gs-robot/system/update_system/";
 var getPatternListURL = "http://127.0.0.1:8888/robotPattern";
-var beginURL = "http://192.168.1.107:5678/gs-robot/cmd/start_system_updater";
-var overURL = "http://192.168.1.107:5678/gs-robot/cmd/stop_system_updater";
+var beginURL = "http://192.168.1.88:5678/gs-robot/cmd/start_system_updater";
+var overURL = "http://192.168.1.88:5678/gs-robot/cmd/stop_system_updater";
 var getUpdatePathURL = "http://rms.gs-robot.me/gs-rms-svr/system_packages/";
 
 $('.modal-trigger').leanModal();
@@ -71,8 +71,8 @@ function downloadFile(urlData, toast) {
     //use request and request-module
     // The options argument is optional so you can omit it
     progress(request(urlData), {
-        throttle: 1000,                    // Throttle the progress event to 2000ms, defaults to 1000ms
-        delay: 1000,                       // Only start to emit after 1000ms delay, defaults to 0ms
+        throttle: 0,                    // Throttle the progress event to 2000ms, defaults to 1000ms
+        delay: 0,                       // Only start to emit after 1000ms delay, defaults to 0ms
         lengthHeader: 'content-length'  // Length header to use, defaults to content-length
     })
         .on('progress', function (state) {
@@ -388,7 +388,7 @@ function uploadAndSubmit() {
     request.post({url:beginURL},function(err,httpResponse,body) {
         $("#progressBar").css("visibility", "visible");
         setTimeout(function () {
-            console.log(body);
+            console.log(httpResponse);
             var object = JSON.parse(body);
             console.log(object);
             if(object.successed) {
@@ -594,7 +594,7 @@ function back() {
     console.log("back");
     $.ajax({
         url: overURL,
-        type: "POST",
+        type: "GET",
         success: function (data) {
         }
     });
