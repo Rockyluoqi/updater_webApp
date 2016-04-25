@@ -373,10 +373,10 @@ function uploadSelectPattern() {
     content.appendChild(list);
 }
 
-document.getElementById('uploadSubmit').addEventListener('click', function () {
-    Materialize.toast('Downloading', 4000);
-    document.getElementById('fileID').click();
-});
+//document.getElementById('uploadSubmit').addEventListener('click', function () {
+//    Materialize.toast('Downloading', 4000);
+//    document.getElementById('fileID').click();
+//});
 
 function uploadAndSubmit() {
     event.preventDefault();

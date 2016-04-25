@@ -112,12 +112,10 @@ $(document).ready(function() {
           url:"http://rms.gs-robot.me/gs-rms-svr/customers/login",
           type:"POST",
           dataType:"json",
+          data: param,
           success:function(data) {
               console.log(data);
-
               var sessionExpirationTime = data.data.sessionExpirationTime;
-
-
 
               if(data.errorCode === "") {
                   sessionStorage.setItem("accessKey",data.data.accessKey);
