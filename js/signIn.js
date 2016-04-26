@@ -109,7 +109,7 @@ $(document).ready(function() {
       };
 
       $.ajax({
-          url:"http://rms.gs-robot.me/gs-rms-svr/customers/login",
+          url:"",
           type:"POST",
           dataType:"json",
           data: JSON.stringify(param),

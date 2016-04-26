@@ -4,12 +4,12 @@
 var request = require('request'),
     fs = require('fs'),
     url = require('url'),
-    http = require('http');
+    progress = require('request-progress'),
+    mkdirp = require('mkdirp');
+
 var restoreURL = "";
 //var downloadURL="http://127.0.0.1:8888/downloadMap";
-var downloadURL="http://192.168.1.105:8088/gs-robot/data/download_map";
-var uploadURL = "http://192.168.1.105:8088/gs-robot/data/upload_map";
-var getMapListURL = "http://192.168.1.105:8080/gs-robot/data/maps";
+
 var beginURL = "";
 var overURL = "";
 var mapListURL = "";
@@ -51,7 +51,7 @@ function downloadFile(urlData,fileName,toast){
 
     //var file_name = url.parse(urlData).pathname.split('/').pop();
     //console.log('filename: ' + file_name);
-    var out = fs.createWriteStream('./download/' + fileName+".tar.gz");
+    var out = fs.createWriteStream('./.map_download/' + fileName+".tar.gz");
 
     console.log(urlData);
 
@@ -131,8 +131,20 @@ document.getElementById('download').addEventListener('click', function () {
     //getPatternList();
     console.log(patternList);
 
+    fs.stat('./.map_download',function(err,stat) {
+        if(err === null) {
+            //folder is existed do nothing
+        } else {
+            mkdirp('./.map_download',function(err) {
+                console.log(err);
+            });
+        }
+    });
+
+
     var list = document.createElement("form");
     var content = document.getElementById('list-content');
+    content.innerHTML = "";
     var h = document.createElement("h4");
     h.innerText = "Select map";
     content.appendChild(h);
@@ -355,7 +367,7 @@ function upload(file,i) {
     };
 
     var fileName = file.name.split(".")[0];
-    console.log("fileName:"+files[i].name+" "+fileName);
+    console.log("fileName:"+file.name+" "+fileName);
     xhr.open("POST", uploadURL+"?map_name="+fileName);
     xhr.send(file);
 }

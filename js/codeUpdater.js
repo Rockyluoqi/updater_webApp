@@ -4,15 +4,10 @@
 var request = require('request'),
     fs = require('fs'),
     url = require('url'),
-    progress = require('request-progress');
+    progress = require('request-progress'),
+    mkdirp = require('mkdirp');
 
-var restoreURL = "http://192.168.1.88:6789/gs-robot/system/rollback";
-var downloadURL = "http://download.gs-robot.me/system_package/";
-var uploadURL = "http://192.168.1.88:6789/gs-robot/system/update_system/";
-var getPatternListURL = "http://127.0.0.1:8888/robotPattern";
-var beginURL = "http://192.168.1.88:5678/gs-robot/cmd/start_system_updater";
-var overURL = "http://192.168.1.88:5678/gs-robot/cmd/stop_system_updater";
-var getUpdatePathURL = "http://rms.gs-robot.me/gs-rms-svr/system_packages/";
+
 
 $('.modal-trigger').leanModal();
 //get pattern list at the first time
@@ -49,7 +44,7 @@ function downloadFile(urlData, toast) {
 
     var file_name = url.parse(urlData).pathname.split('/').pop();
     console.log('filename: ' + file_name);
-    var out = fs.createWriteStream('./download/' + file_name);
+    var out = fs.createWriteStream('./.firmware_download/' + file_name);
 
     //use 'request'
     //request
@@ -145,8 +140,22 @@ document.getElementById('download').addEventListener('click', function () {
     //getPatternList();
     console.log(patternList);
 
+    fs.stat('./.firmware_download',function(err,stat) {
+        if(err === null) {
+            //folder is existed do nothing
+        } else {
+            mkdirp('./.firmware_download',function(err) {
+                console.log(err);
+            });
+        }
+    });
+
     var list = document.createElement("form");
     var content = document.getElementById('list-content');
+    content.innerHTML = "";
+    var h = document.createElement("h4");
+    h.innerText = "Select Robot";
+    content.appendChild(h);
     list.setAttribute('action', "#");
     for (var i = 0; i < patternList.length; i++) {
         var p = document.createElement('p');
