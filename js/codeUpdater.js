@@ -9,7 +9,28 @@ var request = require('request'),
     os = require('os');
 
 //default URLs
+var restoreURL = "http://192.168.1.88:6789/gs-robot/system/rollback";
+var downloadURL = "http://download.gs-robot.com/system_package/";
+var uploadURL = "http://192.168.1.88:6789/gs-robot/system/update_system/";
+var getPatternListURL = "http://127.0.0.1:8888/robotPattern";
+var beginURL = "http://192.168.1.88:5678/gs-robot/cmd/start_system_updater";
+var overURL = "http://192.168.1.88:5678/gs-robot/cmd/stop_system_updater";
+var getUpdatePathURL = "http://rms.gs-robot.me/gs-rms-svr/system_packages/";
 
+var urlMap = {
+    GS_AS_01: {
+        start_updater_api: "http://192.168.1.88:5678/gs-robot/cmd/start_system_updater/",
+        stop_updater_api: "http://192.168.1.88:5678/gs-robot/cmd/stop_system_updater/",
+        update_api: "http://192.168.1.88:6789/gs-robot/system/update_system/",
+        rollback_api: "192.168.1.88:6789/gs-robot/system/rollback/"
+    },
+    GS_SR_01:{
+
+    },
+    GS_RR_01:{
+
+    }
+};
 
 $('.modal-trigger').leanModal();
 
@@ -70,7 +91,7 @@ function downloadFile(urlData, toast) {
             //     }
             // }
             //console.log('progress', state);
-            document.getElementById('downloadProgress1').innerText = toDecimal2(state.percentage*100) + "%" + "  Speed: " + parseInt(state.speed/1024) +" KB/s";
+            document.getElementById('downloadProgress1').textContent = toDecimal2(state.percentage*100) + "%" + "  Speed: " + parseInt(state.speed/1024) +" KB/s";
         })
         .on('error', function (err) {
             console.log("download error: " + err);
@@ -84,10 +105,11 @@ function downloadFile(urlData, toast) {
                 // Do something after request finishes
                 Materialize.toast(file_name + toast, 4000);
             } else {
+                //if user cancel the download action, it'll break the request and delete the incomplete file
                 Materialize.toast(file_name + " download unsuccessfully!", 4000);
                 out.end();
-                console.log("delete file"+file_name_to_delete);
-                fs.unlinkSync('./firmware_download/' + file_name_to_delete);
+                console.log("delete file"+file_name);
+                fs.unlinkSync('./firmware_download/' +file_name);
             }
         })
         .pipe(out);
@@ -153,7 +175,7 @@ document.getElementById('download').addEventListener('click', function () {
     var content = document.getElementById('list-content');
     content.innerHTML = "";
     var h = document.createElement("h4");
-    h.innerText = "Select Robot";
+    h.textContent = "Select Robot";
     content.appendChild(h);
     list.setAttribute('action', "#");
     for (var i = 0; i < patternList.length; i++) {
@@ -165,7 +187,7 @@ document.getElementById('download').addEventListener('click', function () {
         input.setAttribute('value',patternList[i]);
         var label = document.createElement('label');
         label.setAttribute('for', 'test' + i);
-        label.innerText = patternList[i];
+        label.textContent = patternList[i];
         p.appendChild(input);
         p.appendChild(label);
         list.appendChild(p);
@@ -178,7 +200,6 @@ document.getElementById('download').addEventListener('click', function () {
 //    list.innerHTML = "";
 //}
 var currentPattern ="";
-var file_name_to_delete = "";
 document.getElementById('downloadSubmit').addEventListener('click', function () {
     $("#progressBar").css("visibility", "visible");
     var robotPattern = $('input[name="group1"]:checked');
@@ -197,7 +218,7 @@ document.getElementById('downloadSubmit').addEventListener('click', function () 
             var li_1 = document.createElement('li');
             li_1.setAttribute('class', 'collection-item');
             var h = document.createElement('h5');
-            h.innerText = "Downloading";
+            h.textContent = "Downloading";
             li_1.appendChild(h);
             ul.appendChild(li_1);
             var li = document.createElement('li');
@@ -205,18 +226,18 @@ document.getElementById('downloadSubmit').addEventListener('click', function () 
             var div = document.createElement('div');
             div.setAttribute('id', 'list0');
             //div.textContent = files[i].name;
-            div.innerText = object.data.pkg_file_url;
-            file_name_to_delete = div.innerText;
+            div.textContent = object.data.pkg_file_url;
             var a = document.createElement('a');
             a.setAttribute('class', 'secondary-content');
             a.setAttribute('id', "downloadProgress1");
-            a.innerText = "0%";
+            a.textContent = "0%";
 
             var a_svg = document.createElement('a');
             a_svg.setAttribute('class', 'secondary-content');
             a_svg.setAttribute('id', "close1");
             a_svg.setAttribute('style','margin-left:20px');
-            a_svg.setAttribute('onclick','cancelAndDelete()');
+            //a_svg.setAttribute('onclick','cancelAndDelete()');
+            //Svg tag is not surpported
             //var svg = document.createElement('svg');
             //svg.setAttribute('fill', '#00b0ff');
             //svg.setAttribute('height','24');
@@ -240,6 +261,8 @@ document.getElementById('downloadSubmit').addEventListener('click', function () 
             div.appendChild(a);
             li.appendChild(div);
             ul.appendChild(li);
+
+            document.getElementById('close1').addEventListener("click",cancelAndDelete);
 
             downloadFile(downloadURL + object.data.pkg_file_url, ' is downloaded !');
         } else {
@@ -273,8 +296,12 @@ document.getElementById('downloadSubmit').addEventListener('click', function () 
     //downloadFile("http://127.0.0.1:8888/robot1package",' is downloaded !');
 });
 
+/**
+ * function to break the request by making a error
+ */
 function cancelAndDelete() {
     var content = document.getElementById('list0');
+    //This will make a error and the connection of downloading will break
     content.innerHTML = "";
     Materialize.toast("Cancel downloading! ", 4000);
     $("#progressBar").css("visibility", "hidden");
@@ -371,7 +398,7 @@ $('input[type=file]').change(function () {
         var li_1 = document.createElement('li');
         li_1.setAttribute('class', 'collection-item');
         var h = document.createElement('h5');
-        h.innerText = "Upload file list";
+        h.textContent = "Upload file list";
         li_1.appendChild(h);
         ul.appendChild(li_1);
 
@@ -387,10 +414,22 @@ $('input[type=file]').change(function () {
             var a1 = document.createElement('a');
             a1.textContent = " SIZE: " + parseInt(files[i].size / 1024) + "KB";
             a.textContent = "0%";
+
+            var a_svg = document.createElement('a');
+            a_svg.setAttribute('class', 'secondary-content');
+            a_svg.setAttribute('id', "close2");
+            a_svg.setAttribute('style','margin-left:20px');
+
+            var img = document.createElement('img');
+            img.src = "css/icon/ic_cancel_black_24dp_1x.png";
+
+            a_svg.appendChild(img);
+            div.appendChild(a_svg);
             div.appendChild(a);
             div.appendChild(a1);
             li.appendChild(div);
             ul.appendChild(li);
+            document.getElementById('close2').addEventListener('click',cancelChooseFile);
         }
     } else {
         alert("Please choose a file.");
@@ -399,39 +438,19 @@ $('input[type=file]').change(function () {
     }
 });
 
+function cancelChooseFile() {
+    var content = document.getElementById('list0');
+    //when upload this will trigger a error and break the XHR
+    content.innerHTML = "";
+    Materialize.toast("Please choose file again", 4000);
+    $("#uploadBtn").css("background-color", "#DFDFDF");
+    $("#uploadBtn").css("color", "#9F9F9F");
+}
+
 function clearList() {
     var list = document.getElementById('listContainer');
     list.innerHTML = "";
 }
-
-function uploadSelectPattern() {
-    getPatternList();
-    console.log(patternList);
-
-    var list = document.createElement("form");
-    var content = document.getElementById('list-content');
-    list.setAttribute('action', "#");
-    for (var i = 0; i < patternList.length; i++) {
-        var p = document.createElement('p');
-        var input = document.createElement('input');
-        input.setAttribute('name', 'group2');
-        input.setAttribute('type', 'radio');
-        input.setAttribute('id', 'test' + i);
-        input.setAttribute('value',patternList[i]);
-        var label = document.createElement('label');
-        label.setAttribute('for', 'test' + i);
-        label.innerText = patternList[i];
-        p.appendChild(input);
-        p.appendChild(label);
-        list.appendChild(p);
-    }
-    content.appendChild(list);
-}
-
-//document.getElementById('uploadSubmit').addEventListener('click', function () {
-//    Materialize.toast('Downloading', 4000);
-//    document.getElementById('fileID').click();
-//});
 
 function uploadAndSubmit() {
     event.preventDefault();
@@ -476,8 +495,8 @@ function uploadAndSubmit() {
                         var total = e.totalSize || e.total;
                         console.log('xhr progress: ' + Math.round(done / total * 100) + '%');
                         //example update the progress data
-                        //$('#progress1').innerText = Math.round(done / total * 100) + '%';
-                        document.getElementById('progress1').innerText = Math.round(done / total * 100) + '%';
+                        //$('#progress1').textContent = Math.round(done / total * 100) + '%';
+                        document.getElementById('progress1').textContent = Math.round(done / total * 100) + '%';
                     });
                     // 请求完成时建立一个处理程序。
                     xhr.onload = function () {
@@ -502,153 +521,11 @@ function uploadAndSubmit() {
             }
         },3000);
     });
-
-
-    //uploadSelectPattern();
-    //var robotPattern = $('input[name="group2"]:checked').val();
-
-    //if(robotPattern === ) {
-    //    beginURL = "";
-    //}
-
-    //event.preventDefault();
-    //$.ajax({
-    //    url: beginURL,
-    //    type: "POST",
-    //    async: false,
-    //    success: function (data) {
-    //        if (data.status === 200) {
-    //            var form = document.forms["uploadForm"];
-    //            var fileName = $("[name='file']#fileID").val().split('\\').pop();
-    //            //var fileName= $("[name='file']#fileID").val();
-    //            console.log(fileName);
-    //            $("#progressBar").css("visibility", "visible");
-    //            if (form["file"].files.length > 0) {
-    //
-    //                // 寻找表单域中的 <input type="file" ... /> 标签
-    //                var file = form["file"].files[0];
-    //
-    //                //var formData = new FormData();
-    //                //
-    //                //for(var i=0;i<files.length;i++) {
-    //                //  var file = files[i];
-    //                //  formData.append(file.name, file);
-    //                //}
-    //
-    //                var xhr = new XMLHttpRequest();
-    //                (xhr.upload || xhr).addEventListener('progress', function (e) {
-    //                    var done = e.position || e.loaded;
-    //                    var total = e.totalSize || e.total;
-    //                    console.log('xhr progress: ' + Math.round(done / total * 100) + '%');
-    //
-    //                    //example update the progress data
-    //                    $('#progress1').innerText = Math.round(done / total * 100) + '%';
-    //                });
-    //                // 请求完成时建立一个处理程序。
-    //                //xhr.onload = function () {
-    //                //    if (xhr.response.successed) {
-    //                //        // File(s) uploaded.
-    //                //        Materialize.toast("Upload successfully", 4000);
-    //                //    } else {
-    //                //        Materialize.toast("Upload unsuccessfully", 4000);
-    //                //    }
-    //                //};
-    //
-    //                xhr.open("POST", uploadURL + file.name, false);
-    //                xhr.send(file);
-    //
-    //                xhr.onreadystatechange = function () {
-    //                    //if (xhr.readyState == 4) {
-    //                    //    if (xhr.status == 200) {
-    //                    //        console.log("upload complete");
-    //                    //        console.log("response: " + xhr.responseText);
-    //                    //        $("#progressBar").css("visibility", "hidden");
-    //                    //    }
-    //                    //}
-    //                    if (xhr.response.successed) {
-    //                        // File(s) uploaded.
-    //                        Materialize.toast("Upload successfully", 4000);
-    //                        $("#progressBar").css("visibility", "hidden");
-    //                    } else {
-    //                        Materialize.toast("Upload unsuccessfully", 4000);
-    //                        $("#progressBar").css("visibility", "hidden");
-    //                    }
-    //                };
-    //
-    //                //console.log(files);
-    //                //// try sending
-    //                //for(var i=0;i<files.length;i++) {
-    //                //  var file = files[i];
-    //                //  var reader = new FileReader();
-    //                //
-    //                //  reader.onloadstart = function () {
-    //                //    // 这个事件在读取开始时触发
-    //                //    console.log("onloadstart");
-    //                //    document.getElementById("bytesTotal").textContent = file.size;
-    //                //    $("#progressBar").css("visibility", "visible");
-    //                //  };
-    //                //  reader.onprogress = function (p) {
-    //                //    // 这个事件在读取进行中定时触发
-    //                //    console.log("onprogress");
-    //                //    document.getElementById("bytesRead").textContent = p.loaded;
-    //                //  };
-    //                //
-    //                //  reader.onload = function () {
-    //                //    // 这个事件在读取成功结束后触发
-    //                //    console.log("load complete");
-    //                //  };
-    //                //
-    //                //  reader.onloadend = function () {
-    //                //    // 这个事件在读取结束后，无论成功或者失败都会触发
-    //                //    if (reader.error) {
-    //                //      console.log(reader.error);
-    //                //    } else {
-    //                //      document.getElementById("bytesRead").textContent = file.size;
-    //                //      // 构造 XMLHttpRequest 对象，发送文件 Binary 数据
-    //                //      for (var i = 0; i < files.length; i++) {
-    //                //        //or use ajax
-    //                //
-    //                //        var xhr = new XMLHttpRequest();
-    //                //        xhr.open(/* method */ "POST",
-    //                //            /* target url */ "upload.jsp?fileName=" + file.name
-    //                //            /*, async, default to true */);
-    //                //        xhr.overrideMimeType("application/octet-stream");
-    //                //        var zipBinaryBytes = new Uint8Array(reader.result.length);
-    //                //        for (var i = 0; i < reader.result.length; ++i) {
-    //                //          zipBinaryBytes[i] = reader.result.charCodeAt(i);
-    //                //        }
-    //                //        var zipBinary = new Blob([zipBinaryBytes], {type: 'application/zip'});
-    //                //
-    //                //        //sendData(zipBinary);
-    //                //        xhr.send(zipBinary);
-    //                //        console.log(zipBinary);
-    //                //        xhr.onreadystatechange = function () {
-    //                //          if (xhr.readyState == 4) {
-    //                //            if (xhr.status == 200) {
-    //                //              console.log("upload complete");
-    //                //              console.log("response: " + xhr.responseText);
-    //                //              $("#progressBar").css("visibility", "hidden");
-    //                //            }
-    //                //          }
-    //                //        }
-    //                //      }
-    //                //    }
-    //                //  };
-    //                //  reader.readAsBinaryString(file);
-    //                //}
-    //            } else {
-    //                alert("Please choose a file.");
-    //                $("#uploadBtn").css("background-color", "#DFDFDF");
-    //                $("#uploadBtn").css("color", "#9F9F9F");
-    //            }
-    //        }
-    //    }
-    //});
 }
 
 /**
  * ===========================================================================================
- *                                         Go back
+ *                                          Go back
  * ===========================================================================================
  */
 function back() {

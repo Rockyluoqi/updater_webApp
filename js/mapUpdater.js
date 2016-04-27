@@ -5,9 +5,19 @@ var request = require('request'),
     fs = require('fs'),
     url = require('url'),
     progress = require('request-progress'),
+    http = require('http'),
     mkdirp = require('mkdirp');
 
-
+var restoreURL = "";
+//var downloadURL="http://127.0.0.1:8888/downloadMap";
+var downloadURL="http://192.168.1.88:8088/gs-robot/data/download_map";
+var uploadURL = "http://192.168.1.88:8088/gs-robot/data/upload_map";
+var getMapListURL = "http://192.168.1.88:8080/gs-robot/data/maps";
+var beginURL = "http://192.168.1.88:8080/gs-robot/cmd/launch_map_loader";
+var overURL = "http://192.168.1.88:8080/gs-robot/cmd/shutdown_map_loader";
+var hostname = "192.168.1.88";
+var mapListURL = "";
+var urlStart = "";
 $('.modal-trigger').leanModal();
 $.ajax({
     url:beginURL,
@@ -21,25 +31,6 @@ $.ajax({
         }
     }
 });
-//get pattern list at the first time
-//var patternList = [];
-//$.ajax({
-//  url:"",
-//  type:"get",
-//  dataType:"json",
-//  success: function(data) {
-//    if(data.successed) {
-//      patternList.push(data);
-//    }
-//  }
-//});
-//document.getElementById("download").addEventListener('click',function(e) {
-//  e.preventDefault();
-//
-//  downloadFile('data.zip','https://github.com/Rockyluoqi/FlowGraph/archive/master.zip');
-//});
-//
-
 /**
  * ===========================================================================================
  *                                    download project
@@ -63,9 +54,9 @@ function downloadFile(urlData,fileName,toast){
 
     //use nodejs http module
     var options = {
-        hostname:'192.168.1.105',
+        hostname:hostname,
         port:8088,
-        path: "/gs-robot/data/download_map?map_name="+file_name,
+        path: "/gs-robot/data/download_map?map_name="+fileName,
         headers: {
             //need this header
             'Connection':'keep-alive'
@@ -79,7 +70,7 @@ function downloadFile(urlData,fileName,toast){
         }).on('end',function() {
             out.end();
             $("#progressBar").css("visibility", "hidden");
-            Materialize.toast(file_name +toast, 4000);
+            Materialize.toast(fileName +toast, 4000);
         });
     });
 }
@@ -147,7 +138,6 @@ document.getElementById('download').addEventListener('click', function () {
         }
     });
 
-
     var list = document.createElement("form");
     var content = document.getElementById('list-content');
     content.innerHTML = "";
@@ -180,7 +170,7 @@ document.getElementById('downloadSubmit').addEventListener('click',function() {
     for(var i=0;i<selectedMap.length;i++) {
         console.log(selectedMap[i].value);
         //downloadFile("" + value,' is downloaded !');
-        downloadFile(downloadURL+"?mapName = "+selectedMap[i].value, selectedMap[i].value, ' is downloaded !');
+        downloadFile(downloadURL+"?mapName="+selectedMap[i].value, selectedMap[i].value, ' is downloaded !');
     }
     //downloadFile("url"+robotPattern+".zip",' is downloaded !');
     //downloadFile("http://127.0.0.1:8888/robot1package",' is downloaded !');
@@ -253,95 +243,12 @@ function uploadAndSubmit() {
         var files = form["file"].files;
 
         for(var i=0;i<files.length;i++) {
-            //var formData = new FormData();
-            //
-            //for(var i=0;i<files.length;i++) {
-            //  var file = files[i];
-            //  formData.append(file.name, file);
-            //}
             /**
              * Edit: jQuery ajax is not able to handle binary responses properly (can't set responseType), so it's better to use a plain XMLHttpRequest call.
              * @type {XMLHttpRequest}
              */
             upload(files[i],i);
-
-            //xhr.onreadystatechange = function () {
-            //    if (xhr.readyState == 4) {
-            //        if (xhr.status == 200) {
-            //            console.log("upload complete");
-            //            console.log("response: " + xhr.responseText);
-            //            $("#progressBar").css("visibility", "hidden");
-            //        }
-            //    }
-            //};
-
-            ////use request module
-            //var senfile = fs.createReadStream(file).pipe(request.POST("URL").function);
-            //request.POST("url")
         }
-
-
-        //console.log(files);
-        //// try sending
-        //for(var i=0;i<files.length;i++) {
-        //  var file = files[i];
-        //  var reader = new FileReader();
-        //
-        //  reader.onloadstart = function () {
-        //    // 这个事件在读取开始时触发
-        //    console.log("onloadstart");
-        //    document.getElementById("bytesTotal").textContent = file.size;
-        //    $("#progressBar").css("visibility", "visible");
-        //  };
-        //  reader.onprogress = function (p) {
-        //    // 这个事件在读取进行中定时触发
-        //    console.log("onprogress");
-        //    document.getElementById("bytesRead").textContent = p.loaded;
-        //  };
-        //
-        //  reader.onload = function () {
-        //    // 这个事件在读取成功结束后触发
-        //    console.log("load complete");
-        //  };
-        //
-        //  reader.onloadend = function () {
-        //    // 这个事件在读取结束后，无论成功或者失败都会触发
-        //    if (reader.error) {
-        //      console.log(reader.error);
-        //    } else {
-        //      document.getElementById("bytesRead").textContent = file.size;
-        //      // 构造 XMLHttpRequest 对象，发送文件 Binary 数据
-        //      for (var i = 0; i < files.length; i++) {
-        //        //or use ajax
-        //
-        //        var xhr = new XMLHttpRequest();
-        //        xhr.open(/* method */ "POST",
-        //            /* target url */ "upload.jsp?fileName=" + file.name
-        //            /*, async, default to true */);
-        //        xhr.overrideMimeType("application/octet-stream");
-        //        var zipBinaryBytes = new Uint8Array(reader.result.length);
-        //        for (var i = 0; i < reader.result.length; ++i) {
-        //          zipBinaryBytes[i] = reader.result.charCodeAt(i);
-        //        }
-        //        var zipBinary = new Blob([zipBinaryBytes], {type: 'application/zip'});
-        //
-        //        //sendData(zipBinary);
-        //        xhr.send(zipBinary);
-        //        console.log(zipBinary);
-        //        xhr.onreadystatechange = function () {
-        //          if (xhr.readyState == 4) {
-        //            if (xhr.status == 200) {
-        //              console.log("upload complete");
-        //              console.log("response: " + xhr.responseText);
-        //              $("#progressBar").css("visibility", "hidden");
-        //            }
-        //          }
-        //        }
-        //      }
-        //    }
-        //  };
-        //  reader.readAsBinaryString(file);
-        //}
     } else {
         alert("Please choose a file.");
         $("#uploadBtn").css("background-color", "#DFDFDF");

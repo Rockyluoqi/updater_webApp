@@ -128,6 +128,4 @@ $(document).ready(function() {
     //  location.href = "../codeUpdater.html";
     //}
   });
-});/**
- * Created by Luoqi on 4/14/2016.
- */
+});
