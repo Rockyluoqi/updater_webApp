@@ -2,8 +2,11 @@
   "name": "Gaussian_updater",
   "version": "0.0.1",
   "main": "main.js",
-  "scripts":{
-  	"start":"electron ."
+  "scripts": {
+    "start": "electron ."
   },
-  "license":"MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "electron-packager": "^7.0.1"
+  }
 }

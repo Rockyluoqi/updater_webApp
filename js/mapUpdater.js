@@ -7,14 +7,20 @@ var request = require('request'),
     progress = require('request-progress'),
     mkdirp = require('mkdirp');
 
-var restoreURL = "";
-//var downloadURL="http://127.0.0.1:8888/downloadMap";
 
-var beginURL = "";
-var overURL = "";
-var mapListURL = "";
-var urlStart = "";
 $('.modal-trigger').leanModal();
+$.ajax({
+    url:beginURL,
+    type:"GET",
+    success:function(data) {
+        console.log("start response"+data);
+        if(data.errorCode === "") {
+            Materialize.toast("Mission start!", 4000);
+        } else {
+            Materialize.toast("Start unsuccessfully!", 4000);
+        }
+    }
+});
 //get pattern list at the first time
 //var patternList = [];
 //$.ajax({
@@ -51,7 +57,7 @@ function downloadFile(urlData,fileName,toast){
 
     //var file_name = url.parse(urlData).pathname.split('/').pop();
     //console.log('filename: ' + file_name);
-    var out = fs.createWriteStream('./.map_download/' + fileName+".tar.gz");
+    var out = fs.createWriteStream('./map_download/' + fileName+".tar.gz");
 
     console.log(urlData);
 
@@ -131,11 +137,11 @@ document.getElementById('download').addEventListener('click', function () {
     //getPatternList();
     console.log(patternList);
 
-    fs.stat('./.map_download',function(err,stat) {
+    fs.stat('./map_download',function(err,stat) {
         if(err === null) {
             //folder is existed do nothing
         } else {
-            mkdirp('./.map_download',function(err) {
+            mkdirp('./map_download',function(err) {
                 console.log(err);
             });
         }
@@ -374,5 +380,12 @@ function upload(file,i) {
 
 function back() {
     console.log("back");
+    $.ajax({
+        url:overURL,
+        type:"GET",
+        success:function(data) {
+            console.log("shut down response: "+data);
+        }
+    });
     location.href = "selectModule.html";
 }
