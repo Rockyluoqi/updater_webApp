@@ -9,28 +9,7 @@ var request = require('request'),
     os = require('os');
 
 //default URLs
-var restoreURL = "http://192.168.1.88:6789/gs-robot/system/rollback";
-var downloadURL = "http://download.gs-robot.com/system_package/";
-var uploadURL = "http://192.168.1.88:6789/gs-robot/system/update_system/";
-var getPatternListURL = "http://127.0.0.1:8888/robotPattern";
-var beginURL = "http://192.168.1.88:5678/gs-robot/cmd/start_system_updater";
-var overURL = "http://192.168.1.88:5678/gs-robot/cmd/stop_system_updater";
-var getUpdatePathURL = "http://rms.gs-robot.me/gs-rms-svr/system_packages/";
 
-var urlMap = {
-    GS_AS_01: {
-        start_updater_api: "http://192.168.1.88:5678/gs-robot/cmd/start_system_updater/",
-        stop_updater_api: "http://192.168.1.88:5678/gs-robot/cmd/stop_system_updater/",
-        update_api: "http://192.168.1.88:6789/gs-robot/system/update_system/",
-        rollback_api: "192.168.1.88:6789/gs-robot/system/rollback/"
-    },
-    GS_SR_01:{
-
-    },
-    GS_RR_01:{
-
-    }
-};
 
 $('.modal-trigger').leanModal();
 
@@ -98,6 +77,7 @@ function downloadFile(urlData, toast) {
             downloadError = true;
         })
         .on('end', function (response) {
+            console.log(response);
             console.log("finish.....");
             $("#progressBar").css("visibility", "hidden");
             console.log(downloadError);
@@ -161,6 +141,7 @@ document.getElementById('download').addEventListener('click', function () {
     //getPatternList();
     //console.log(patternList);
 
+    //check if firmware_download is existed, if not it'll create a new folder
     fs.stat('./firmware_download', function (err, stat) {
         if (err === null) {
             //folder is existed do nothing
@@ -201,106 +182,107 @@ document.getElementById('download').addEventListener('click', function () {
 //}
 var currentPattern ="";
 document.getElementById('downloadSubmit').addEventListener('click', function () {
+    $.ajax({
+        type: "GET",
+        url: "http://www.baidu.com",
+        success: function(data){
+            download();
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+            console.log(textStatus);
+            if(textStatus == 'error') {
+                Materialize.toast("Please connect to the Internet first!",10000);
+            }
+        }
+    });
+});
+
+function download() {
     $("#progressBar").css("visibility", "visible");
     var robotPattern = $('input[name="group1"]:checked');
     currentPattern = robotPattern[0].value;
-
+    $("#robotPattern").text("Robot pattern: "+currentPattern);
     var xhr = new XMLHttpRequest();
 
     xhr.onload = function () {
-        var object = JSON.parse(xhr.response);
-        console.log(object);
-        if (object.msg === "successed") {
-            Materialize.toast("Get UpdatePath successfully.", 4000);
-
-            var ul = document.getElementById('listContainer');
-            clearList();
-            var li_1 = document.createElement('li');
-            li_1.setAttribute('class', 'collection-item');
-            var h = document.createElement('h5');
-            h.textContent = "Downloading";
-            li_1.appendChild(h);
-            ul.appendChild(li_1);
-            var li = document.createElement('li');
-            li.setAttribute('class', 'collection-item');
-            var div = document.createElement('div');
-            div.setAttribute('id', 'list0');
-            //div.textContent = files[i].name;
-            div.textContent = object.data.pkg_file_url;
-            var a = document.createElement('a');
-            a.setAttribute('class', 'secondary-content');
-            a.setAttribute('id', "downloadProgress1");
-            a.textContent = "0%";
-
-            var a_svg = document.createElement('a');
-            a_svg.setAttribute('class', 'secondary-content');
-            a_svg.setAttribute('id', "close1");
-            a_svg.setAttribute('style','margin-left:20px');
-            //a_svg.setAttribute('onclick','cancelAndDelete()');
-            //Svg tag is not surpported
-            //var svg = document.createElement('svg');
-            //svg.setAttribute('fill', '#00b0ff');
-            //svg.setAttribute('height','24');
-            //svg.setAttribute('width','24');
-            //svg.setAttribute('viewBox','0 0 24 24');
-            //svg.setAttribute('xmlns','http://www.w3.org/2000/svg');
-            //var path1 = document.createElement('path');
-            //var path2 = document.createElement('path');
-            //path1.setAttribute('d','M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z');
-            //path2.setAttribute('d','M0 0h24v24H0z');
-            //path2.setAttribute('fill', 'none');
-            //svg.appendChild(path1);
-            //svg.appendChild(path2);
-
-            var img = document.createElement('img');
-            img.src = "css/icon/ic_cancel_black_24dp_1x.png";
-
-            a_svg.appendChild(img);
-
-            div.appendChild(a_svg);
-            div.appendChild(a);
-            li.appendChild(div);
-            ul.appendChild(li);
-
-            document.getElementById('close1').addEventListener("click",cancelAndDelete);
-
-            downloadFile(downloadURL + object.data.pkg_file_url, ' is downloaded !');
-        } else {
+        if(xhr.status === 400) {
             $("#progressBar").css("visibility", "hidden");
-            Materialize.toast("Oops... Get UpdatePath unsuccessfully.", 4000);
+            Materialize.toast("Download unsuccessfully (no latest update in the server)",10000);
+        } else {
+            var object = JSON.parse(xhr.response);
+            console.log(object);
+            if (object.msg === "successed") {
+                Materialize.toast("Get UpdatePath successfully.", 4000);
+
+                var ul = document.getElementById('listContainer');
+                clearList();
+                var li_1 = document.createElement('li');
+                li_1.setAttribute('class', 'collection-item');
+                var h = document.createElement('h5');
+                h.textContent = "Downloading";
+                li_1.appendChild(h);
+                ul.appendChild(li_1);
+                var li = document.createElement('li');
+                li.setAttribute('class', 'collection-item');
+                var div = document.createElement('div');
+                div.setAttribute('id', 'list0');
+                //div.textContent = files[i].name;
+                div.textContent = object.data.pkg_file_url;
+                var a = document.createElement('a');
+                a.setAttribute('class', 'secondary-content');
+                a.setAttribute('id', "downloadProgress1");
+                a.textContent = "0%";
+
+                var a_svg = document.createElement('a');
+                a_svg.setAttribute('class', 'secondary-content');
+                a_svg.setAttribute('id', "close1");
+                a_svg.setAttribute('style', 'margin-left:20px');
+                //a_svg.setAttribute('onclick','cancelAndDelete()');
+                //Svg tag is not surpported
+                //var svg = document.createElement('svg');
+                //svg.setAttribute('fill', '#00b0ff');
+                //svg.setAttribute('height','24');
+                //svg.setAttribute('width','24');
+                //svg.setAttribute('viewBox','0 0 24 24');
+                //svg.setAttribute('xmlns','http://www.w3.org/2000/svg');
+                //var path1 = document.createElement('path');
+                //var path2 = document.createElement('path');
+                //path1.setAttribute('d','M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z');
+                //path2.setAttribute('d','M0 0h24v24H0z');
+                //path2.setAttribute('fill', 'none');
+                //svg.appendChild(path1);
+                //svg.appendChild(path2);
+
+                var img = document.createElement('img');
+                img.src = "css/icon/ic_cancel_black_24dp_1x.png";
+
+                a_svg.appendChild(img);
+
+                div.appendChild(a_svg);
+                div.appendChild(a);
+                li.appendChild(div);
+                ul.appendChild(li);
+
+                document.getElementById('close1').addEventListener("click", cancelAndDelete);
+
+                downloadFile(downloadURL + object.data.pkg_file_url, ' is downloaded !');
+            } else {
+                $("#progressBar").css("visibility", "hidden");
+                Materialize.toast("Oops... Get UpdatePath unsuccessfully.", 4000);
+            }
         }
     };
     xhr.open("GET", getUpdatePathURL + currentPattern + "/latest");
     xhr.setRequestHeader("desktop_web_access_key",sessionStorage.getItem("accessKey"));
     xhr.setRequestHeader("client_type","DESKTOP_WEB");
     xhr.send(null);
-    //var options = {
-    //    url:getUpdatePathURL + robotPattern + "/latest",
-    //    headers: {
-    //        desktop_web_access_key: sessionStorage.getItem("accessKey"),
-    //        client_type: "DESKTOP_WEB"
-    //    }
-    //};
-    //
-    //console.log(options.headers.client_type);
-    //
-    //request.get(options,function(e,r,body) {
-    //    var object = JSON.parse(body);
-    //    if (object.msg === "successed") {
-    //        Materialize.toast("Get UpdatePath successfully.", 4000);
-    //        downloadFile(downloadURL + data.pkg_file_url, ' is downloaded !');
-    //    } else {
-    //        Materialize.toast("Oops... Get UpdatePath unsuccessfully.", 4000);
-    //    }
-    //});
-    //downloadFile("http://127.0.0.1:8888/robot1package",' is downloaded !');
-});
+}
 
 /**
  * function to break the request by making a error
  */
 function cancelAndDelete() {
-    var content = document.getElementById('list0');
+    var content = document.getElementById('listContainer');
     //This will make a error and the connection of downloading will break
     content.innerHTML = "";
     Materialize.toast("Cancel downloading! ", 4000);
@@ -328,27 +310,47 @@ document.getElementById('restore').addEventListener('click', function () {
         beginURL = urlMap.GS_AS_01.start_updater_api;
         restoreURL = urlMap.GS_AS_01.rollback_api;
     } else if(currentPattern = "GS_SR_01") {
-        //overURL = urlMap.GS_AS_01.stop_updater_api;
+        beginURL = urlMap.GS_SR_01.start_updater_api;
+        restoreURL = urlMap.GS_SR_01.rollback_api;
     }
-    request.post({url:beginURL},function(err,httpResponse,body) {
-        setTimeout(function () {
-            $.ajax({
-                url: restoreURL,
-                type: "GET",
-                success: function (data) {
-                    console.log(data);
-                    var object = JSON.parse(data);
-                    if (object.successed) {
-                        $("#progressBar").css("visibility", "hidden");
-                        Materialize.toast("Rollback successfully!", 4000);
-                    } else {
-                        $("#progressBar").css("visibility", "hidden");
-                        Materialize.toast("Oops... Rollback unsuccessfully!", 4000);
-                    }
+
+    if(beginURL != "") {
+        $.ajax({
+            type: "GET",
+            url: beginURL,
+            success: function (data) {
+                request.get({url: beginURL}, function (err, httpResponse, body) {
+                    setTimeout(function () {
+                        $.ajax({
+                            url: restoreURL,
+                            type: "GET",
+                            success: function (data) {
+                                console.log(data);
+                                var object = JSON.parse(data);
+                                if (object.successed) {
+                                    $("#progressBar").css("visibility", "hidden");
+                                    Materialize.toast("Rollback successfully!", 4000);
+                                } else {
+                                    $("#progressBar").css("visibility", "hidden");
+                                    Materialize.toast("Oops... Rollback unsuccessfully!", 4000);
+                                }
+                            }
+                        });
+                    }, 4000);
+                });
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                console.log(textStatus);
+                $("#progressBar").css("visibility", "hidden");
+                if (textStatus == 'error') {
+                    Materialize.toast("Please connect to the robot WI-FI first!", 10000);
                 }
-            });
-        },3000);
-    });
+            }
+        });
+    } else {
+        $("#progressBar").css("visibility", "hidden");
+        Materialize.toast("You can't rollback now. Robot is not ready.", 10000);
+    }
 
     ////删除目录下的所有文件
     //var files = getAllFiles('./download');
@@ -386,6 +388,7 @@ function getAllFiles(root) {
  */
 //show selected files in a list
 $('input[type=file]').change(function () {
+    Materialize.toast("Please connect to the robot WI-FI before update", 8000);
     var form = document.forms["uploadForm"];
     if (form["file"].files.length > 0) {
         $("#uploadBtn").css("background-color", "#2196F3");
@@ -415,21 +418,21 @@ $('input[type=file]').change(function () {
             a1.textContent = " SIZE: " + parseInt(files[i].size / 1024) + "KB";
             a.textContent = "0%";
 
-            var a_svg = document.createElement('a');
-            a_svg.setAttribute('class', 'secondary-content');
-            a_svg.setAttribute('id', "close2");
-            a_svg.setAttribute('style','margin-left:20px');
+            //var a_svg = document.createElement('a');
+            //a_svg.setAttribute('class', 'secondary-content');
+            //a_svg.setAttribute('id', "close2");
+            //a_svg.setAttribute('style','margin-left:20px');
+            //
+            //var img = document.createElement('img');
+            //img.src = "css/icon/ic_cancel_black_24dp_1x.png";
 
-            var img = document.createElement('img');
-            img.src = "css/icon/ic_cancel_black_24dp_1x.png";
-
-            a_svg.appendChild(img);
-            div.appendChild(a_svg);
+            //a_svg.appendChild(img);
+            //div.appendChild(a_svg);
             div.appendChild(a);
             div.appendChild(a1);
             li.appendChild(div);
             ul.appendChild(li);
-            document.getElementById('close2').addEventListener('click',cancelChooseFile);
+            //document.getElementById('close2').addEventListener('click',cancelChooseFile);
         }
     } else {
         alert("Please choose a file.");
@@ -461,66 +464,92 @@ function uploadAndSubmit() {
         beginURL = urlMap.GS_AS_01.start_updater_api;
         uploadURL = urlMap.GS_AS_01.update_api;
     } else if(currentPattern = "GS_SR_01") {
-        //overURL = urlMap.GS_AS_01.stop_updater_api;
+        beginURL = urlMap.GS_SR_01.start_updater_api;
+        uploadURL = urlMap.GS_SR_01.update_api;
     }
-    //use request
-    request.post({url:beginURL},function(err,httpResponse,body) {
-        $("#progressBar").css("visibility", "visible");
-        setTimeout(function () {
-            console.log(httpResponse);
-            var object = JSON.parse(body);
-            console.log(object);
-            if(object.successed) {
-                var robotPattern = $('input[name="group2"]:checked').val();
-                var form = document.forms["uploadForm"];
-                var fileName = $("[name='file']#fileID").val().split('\\').pop();
-                //var fileName= $("[name='file']#fileID").val();
-                console.log(fileName);
-                $("#progressBar").css("visibility", "visible");
-                if (form["file"].files.length > 0) {
 
-                    // 寻找表单域中的 <input type="file" ... /> 标签
-                    var file = form["file"].files[0];
+    if(beginURL != "") {
+        $.ajax({
+            type: "GET",
+            url: beginURL,
+            success: function (data) {
+                //use request
+                request.get({url: beginURL}, function (err, httpResponse, body) {
+                    $("#progressBar").css("visibility", "visible");
+                    setTimeout(function () {
+                        console.log(httpResponse);
+                        var object = JSON.parse(body);
+                        console.log(object);
+                        if (object.successed) {
+                            var robotPattern = $('input[name="group2"]:checked').val();
+                            var form = document.forms["uploadForm"];
+                            var fileName = $("[name='file']#fileID").val().split('\\').pop();
+                            //var fileName= $("[name='file']#fileID").val();
+                            console.log(fileName);
+                            $("#progressBar").css("visibility", "visible");
+                            if (form["file"].files.length > 0) {
 
-                    //var formData = new FormData();
-                    //
-                    //for(var i=0;i<files.length;i++) {
-                    //  var file = files[i];
-                    //  formData.append(file.name, file);
-                    //}
+                                // 寻找表单域中的 <input type="file" ... /> 标签
+                                var file = form["file"].files[0];
 
-                    var xhr = new XMLHttpRequest();
-                    (xhr.upload || xhr).addEventListener('progress', function (e) {
-                        var done = e.position || e.loaded;
-                        var total = e.totalSize || e.total;
-                        console.log('xhr progress: ' + Math.round(done / total * 100) + '%');
-                        //example update the progress data
-                        //$('#progress1').textContent = Math.round(done / total * 100) + '%';
-                        document.getElementById('progress1').textContent = Math.round(done / total * 100) + '%';
-                    });
-                    // 请求完成时建立一个处理程序。
-                    xhr.onload = function () {
-                        console.log(xhr.status);
-                        if (xhr.status == 200) {
-                            Materialize.toast("Upload successfully", 4000);
-                            $("#progressBar").css("visibility", "hidden");
-                        } else {
-                            Materialize.toast("Oops...Upload unsuccessfully", 4000);
-                            $("#progressBar").css("visibility", "hidden");
-                            console.log(xhr.response);
+                                //var formData = new FormData();
+                                //
+                                //for(var i=0;i<files.length;i++) {
+                                //  var file = files[i];
+                                //  formData.append(file.name, file);
+                                //}
+
+                                var xhr = new XMLHttpRequest();
+                                (xhr.upload || xhr).addEventListener('progress', function (e) {
+                                    var done = e.position || e.loaded;
+                                    var total = e.totalSize || e.total;
+                                    console.log('xhr progress: ' + Math.round(done / total * 100) + '%');
+                                    //example update the progress data
+                                    //$('#progress1').textContent = Math.round(done / total * 100) + '%';
+                                    document.getElementById('progress1').textContent = Math.round(done / total * 100) + '%';
+                                    if (done === total) {
+                                        document.getElementById('progress1').textContent = "Decompressing and installing";
+                                    }
+                                });
+                                // 请求完成时建立一个处理程序。
+                                xhr.onload = function () {
+                                    console.log(xhr.status);
+                                    if (xhr.status == 200) {
+                                        document.getElementById('progress1').textContent = "Update complete";
+                                        Materialize.toast("Update successfully", 4000);
+                                        Materialize.toast("If you want to use the updated features, please restart your robot.", 100000);
+                                        $("#progressBar").css("visibility", "hidden");
+                                    } else {
+                                        document.getElementById('progress1').textContent = "Update unsuccessfully";
+                                        Materialize.toast("Oops...Update unsuccessfully", 4000);
+                                        $("#progressBar").css("visibility", "hidden");
+                                        console.log(xhr.response);
+                                    }
+                                };
+
+                                xhr.open("POST", uploadURL + file.name);
+                                xhr.send(file);
+                            } else {
+                                alert("Please choose a file.");
+                                $("#uploadBtn").css("background-color", "#DFDFDF");
+                                $("#uploadBtn").css("color", "#9F9F9F");
+                            }
                         }
-                    };
-
-                    xhr.open("POST", uploadURL + file.name);
-                    xhr.send(file);
-                } else {
-                    alert("Please choose a file.");
-                    $("#uploadBtn").css("background-color", "#DFDFDF");
-                    $("#uploadBtn").css("color", "#9F9F9F");
+                    }, 4000);
+                });
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                console.log(textStatus);
+                $("#progressBar").css("visibility", "hidden");
+                if (textStatus == 'error') {
+                    Materialize.toast("Please connect to the robot WI-FI first!", 10000);
                 }
             }
-        },3000);
-    });
+        });
+    } else {
+        $("#progressBar").css("visibility", "hidden");
+        Materialize.toast("You can't update now. Robot is not ready.", 10000);
+    }
 }
 
 /**

@@ -10,14 +10,7 @@ var request = require('request'),
 
 var restoreURL = "";
 //var downloadURL="http://127.0.0.1:8888/downloadMap";
-var downloadURL="http://192.168.1.88:8088/gs-robot/data/download_map";
-var uploadURL = "http://192.168.1.88:8088/gs-robot/data/upload_map";
-var getMapListURL = "http://192.168.1.88:8080/gs-robot/data/maps";
-var beginURL = "http://192.168.1.88:8080/gs-robot/cmd/launch_map_loader";
-var overURL = "http://192.168.1.88:8080/gs-robot/cmd/shutdown_map_loader";
-var hostname = "192.168.1.88";
-var mapListURL = "";
-var urlStart = "";
+
 $('.modal-trigger').leanModal();
 $.ajax({
     url:beginURL,

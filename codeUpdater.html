@@ -94,12 +94,13 @@
                 <a class="waves-effect waves-light btn-large tooltipped" id="uploadBtn" data-position="bottom"
                    data-delay="50" data-tooltip="上传选中固件" href="#"
                    onclick="document.getElementById('upload').click();return false;">push & update</a>
-                <input id="fileID" type="file" accept=".tar.gz" name="file" style="visibility: hidden"/>
+                <input id="fileID" type="file" accept=".gspkg" name="file" style="visibility: hidden"/>
                 <!--multiple="multiple"/>-->
                 <input id="upload" type="submit" value="Submit" style="visibility: hidden"/>
             </form>
             <div style="position: relative">
-                <p class="tips">Please connect to the car WI-FI first.</p>
+                <p class="tips" id="robotPattern"></p>
+                <p class="tips">Please connect to the robot WI-FI before uploading!</p>
                 <ul class="collection with-header" id="listContainer">
                     <!--<li class="collection-item">-->
                     <!--<div>Alvin<a href="#!" class="secondary-content">50%</a></div>-->
