@@ -10,7 +10,31 @@ var request = require('request'),
     dns = require('dns');
 
 //default URLs
+var downloadURL = "http://download.gs-robot.com/system_package/";
+var getUpdatePathURL = "http://rms.gs-robot.com/gs-rms-svr/system_packages/";
 
+var restoreURL = "http://192.168.1.88:6789/gs-robot/system/rollback";
+var uploadURL = "http://192.168.1.88:6789/gs-robot/system/update_system/";
+var beginURL = "http://192.168.1.88:5678/gs-robot/cmd/launch_system_updater";
+var overURL = "http://192.168.1.88:5678/gs-robot/cmd/shutdown_system_updater";
+
+var urlMap = {
+    GS_AS_01: {
+        start_updater_api: "http://192.168.1.88:5678/gs-robot/cmd/launch_system_updater",
+        stop_updater_api: "http://192.168.1.88:5678/gs-robot/cmd/shutdown_system_updater",
+        update_api: "http://192.168.1.88:6789/gs-robot/system/update_system/",
+        rollback_api: "http://192.168.1.88:6789/gs-robot/system/rollback"
+    },
+    GS_SR_01:{
+        start_updater_api: "http://192.168.1.88:8080/gs-robot/cmd/launch_system_updater",
+        stop_updater_api: "http://192.168.1.88:8080/gs-robot/cmd/shutdown_system_updater",
+        update_api: "http://192.168.1.88:8088/gs-robot/system/update_system/",
+        rollback_api: "http://192.168.1.88:8088/gs-robot/system/rollback"
+    }
+    //GS_RR_01:{
+    //
+    //}
+};
 
 $('.modal-trigger').leanModal();
 
@@ -82,11 +106,12 @@ function downloadFile(urlData, toast) {
             console.log("finish.....");
             $("#progressBar").css("visibility", "hidden");
             console.log(downloadError);
+            $("#chooseFileBtn").css('visibility','visible');
+            $("#uploadBtn").css('visibility','visible');
             if(!downloadError) {
                 // Do something after request finishes
                 Materialize.toast(file_name + toast, 4000);
-                $("#chooseFileBtn").css('visibility','visible');
-                $("#uploadBtn").css('visibility','visible');
+                Materialize.toast(file_name + " is saved in firmware_download folder!", 8000);
             } else {
                 //if user cancel the download action, it'll break the request and delete the incomplete file
                 Materialize.toast(file_name + " download unsuccessfully!", 4000);
@@ -188,6 +213,8 @@ function download() {
 
     xhr.onload = function () {
         if(xhr.status === 400) {
+            $("#chooseFileBtn").css('visibility','visible');
+            $("#uploadBtn").css('visibility','visible');
             $("#progressBar").css("visibility", "hidden");
             Materialize.toast("Download unsuccessfully (no latest update in the server)",10000);
         } else {

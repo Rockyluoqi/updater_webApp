@@ -335,6 +335,14 @@ top:2px;
     padding: 7px;
 }
 
+#refreshBtn {
+    margin-top: 30px;
+    width: 60px;
+    height: 60px;
+    left: 17px;
+    padding: 12px;
+}
+
 #projectModule {
     width: 300px;
     height: 100px;
@@ -370,7 +378,7 @@ top:2px;
     position: absolute;
     z-index: 10;
     visibility: hidden;
-    margin-left: 84px;
+    margin-left: 153px;
     margin-top: 30px
 }
 

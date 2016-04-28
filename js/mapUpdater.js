@@ -8,7 +8,16 @@ var request = require('request'),
     http = require('http'),
     mkdirp = require('mkdirp');
 
-
+var restoreURL = "";
+//var downloadURL="http://127.0.0.1:8888/downloadMap";
+var downloadURL="http://192.168.1.88:8088/gs-robot/data/download_map";
+var uploadURL = "http://192.168.1.88:8088/gs-robot/data/upload_map";
+var getMapListURL = "http://192.168.1.88:8080/gs-robot/data/maps";
+var beginURL = "http://192.168.1.88:8080/gs-robot/cmd/launch_map_loader";
+var overURL = "http://192.168.1.88:8080/gs-robot/cmd/shutdown_map_loader";
+var hostname = "192.168.1.88";
+var mapListURL = "";
+var urlStart = "";
 $('.modal-trigger').leanModal();
 $.ajax({
     url:beginURL,
@@ -19,6 +28,13 @@ $.ajax({
             Materialize.toast("Mission start!", 4000);
         } else {
             Materialize.toast("Start unsuccessfully!", 4000);
+        }
+    },
+    error: function(XMLHttpRequest, textStatus, errorThrown) {
+        console.log(textStatus);
+        if(textStatus == 'error') {
+            Materialize.toast("Start module unsuccessfully!",6000);
+            Materialize.toast("Please connect to the Robot WI-FI first and refresh!",10000);
         }
     }
 });
@@ -62,6 +78,7 @@ function downloadFile(urlData,fileName,toast){
             out.end();
             $("#progressBar").css("visibility", "hidden");
             Materialize.toast(fileName +toast, 4000);
+            Materialize.toast(fileName + " is saved in map_download folder!", 6000);
         });
     });
 }
@@ -92,7 +109,6 @@ function getImageList() {
         url: getMapListURL,
         type: "GET",
         dataType: "json",
-        async: false,
         success: function (data) {
             //console.log(data);
             localStorage["mapList"] = JSON.stringify(data);
@@ -167,8 +183,11 @@ document.getElementById('downloadSubmit').addEventListener('click',function() {
     //downloadFile("http://127.0.0.1:8888/robot1package",' is downloaded !');
 });
 
+document.getElementById("refreshBtn").addEventListener('click', refresh);
 
-
+function refresh() {
+    location.reload();
+}
 /**
  * ===========================================================================================
  *                                         Upload
