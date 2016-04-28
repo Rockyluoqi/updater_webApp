@@ -6,7 +6,8 @@ var request = require('request'),
     url = require('url'),
     progress = require('request-progress'),
     mkdirp = require('mkdirp'),
-    os = require('os');
+    os = require('os'),
+    dns = require('dns');
 
 //default URLs
 
@@ -84,6 +85,8 @@ function downloadFile(urlData, toast) {
             if(!downloadError) {
                 // Do something after request finishes
                 Materialize.toast(file_name + toast, 4000);
+                $("#chooseFileBtn").css('visibility','visible');
+                $("#uploadBtn").css('visibility','visible');
             } else {
                 //if user cancel the download action, it'll break the request and delete the incomplete file
                 Materialize.toast(file_name + " download unsuccessfully!", 4000);
@@ -116,7 +119,7 @@ function toDecimal2(x) {
 
 //var $upload = $('#upload');
 //$upload.('change',onFileInputChange,false);
-var patternList = [];
+var patternList = ["GS-AS-01","GS-SR-01"];
 function getPatternList() {
     $.ajax({
         url: getPatternListURL,
@@ -135,8 +138,6 @@ function getPatternList() {
 }
 
 document.getElementById('download').addEventListener('click', function () {
-    //test
-    patternList = ["GS-AS-01","GS-SR-01"];
     //patternList = [];
     //getPatternList();
     //console.log(patternList);
@@ -152,28 +153,7 @@ document.getElementById('download').addEventListener('click', function () {
         }
     });
 
-    var list = document.createElement("form");
-    var content = document.getElementById('list-content');
-    content.innerHTML = "";
-    var h = document.createElement("h4");
-    h.textContent = "Select Robot";
-    content.appendChild(h);
-    list.setAttribute('action', "#");
-    for (var i = 0; i < patternList.length; i++) {
-        var p = document.createElement('p');
-        var input = document.createElement('input');
-        input.setAttribute('name', 'group1');
-        input.setAttribute('type', 'radio');
-        input.setAttribute('id', 'test' + i);
-        input.setAttribute('value',patternList[i]);
-        var label = document.createElement('label');
-        label.setAttribute('for', 'test' + i);
-        label.textContent = patternList[i];
-        p.appendChild(input);
-        p.appendChild(label);
-        list.appendChild(p);
-    }
-    content.appendChild(list);
+    selectPattern('list-content');
 });
 
 //function clearPatternList() {
@@ -182,6 +162,8 @@ document.getElementById('download').addEventListener('click', function () {
 //}
 var currentPattern ="";
 document.getElementById('downloadSubmit').addEventListener('click', function () {
+    $("#chooseFileBtn").css('visibility','hidden');
+    $("#uploadBtn").css('visibility','hidden');
     $.ajax({
         type: "GET",
         url: "http://www.baidu.com",
@@ -304,17 +286,38 @@ function deleteAll(files) {
  *                                 restore the last version
  * ===========================================================================================
  */
-document.getElementById('restore').addEventListener('click', function () {
+document.getElementById('rollback').addEventListener('click', function () {
+    if(currentPattern === "") {
+        selectPattern('list-content-rollback');
+        $('#patternListRollback').openModal();
+    } else {
+        restore();
+    }
+    ////删除目录下的所有文件
+    //var files = getAllFiles('./download');
+    //for (let value of files) {
+    //    fs.unlinkSync(value);
+    //}
+    //
+    //downloadFile(restoreURL, ' is restored !');
+
+});
+
+function restore() {
+    var robotPattern = $('input[name="group1"]:checked');
+    currentPattern = robotPattern[0].value;
+    $("#robotPattern").text("Robot pattern: "+currentPattern);
+
     $("#progressBar").css("visibility", "visible");
-    if(currentPattern === "GS-AS-01") {
+    if (currentPattern === "GS-AS-01") {
         beginURL = urlMap.GS_AS_01.start_updater_api;
         restoreURL = urlMap.GS_AS_01.rollback_api;
-    } else if(currentPattern = "GS_SR_01") {
+    } else if (currentPattern = "GS_SR_01") {
         beginURL = urlMap.GS_SR_01.start_updater_api;
         restoreURL = urlMap.GS_SR_01.rollback_api;
     }
 
-    if(beginURL != "") {
+    if (beginURL != "") {
         $.ajax({
             type: "GET",
             url: beginURL,
@@ -342,6 +345,7 @@ document.getElementById('restore').addEventListener('click', function () {
             error: function (XMLHttpRequest, textStatus, errorThrown) {
                 console.log(textStatus);
                 $("#progressBar").css("visibility", "hidden");
+                Materialize.toast("Please connect to the robot WI-FI first!", 10000);
                 if (textStatus == 'error') {
                     Materialize.toast("Please connect to the robot WI-FI first!", 10000);
                 }
@@ -351,16 +355,7 @@ document.getElementById('restore').addEventListener('click', function () {
         $("#progressBar").css("visibility", "hidden");
         Materialize.toast("You can't rollback now. Robot is not ready.", 10000);
     }
-
-    ////删除目录下的所有文件
-    //var files = getAllFiles('./download');
-    //for (let value of files) {
-    //    fs.unlinkSync(value);
-    //}
-    //
-    //downloadFile(restoreURL, ' is restored !');
-
-});
+}
 
 //获得指定目录下的所有文件
 function getAllFiles(root) {
@@ -388,6 +383,8 @@ function getAllFiles(root) {
  */
 //show selected files in a list
 $('input[type=file]').change(function () {
+    var robotPattern = $('input[name="group1"]:checked');
+    currentPattern = robotPattern[0].value;
     Materialize.toast("Please connect to the robot WI-FI before update", 8000);
     var form = document.forms["uploadForm"];
     if (form["file"].files.length > 0) {
@@ -441,6 +438,51 @@ $('input[type=file]').change(function () {
     }
 });
 
+document.getElementById("chooseFileBtn").addEventListener('click',function() {
+    if(currentPattern === "") {
+        selectPattern("list-content-upload");
+        $('#patternListUpload').openModal();
+    } else {
+        var robotPattern = $('input[name="group1"]:checked');
+        currentPattern = robotPattern[0].value;
+        $("#robotPattern").text("Robot pattern: "+currentPattern);
+        document.getElementById('fileID').click();
+    }
+});
+
+document.getElementById('yesChoose').addEventListener('click',function() {
+    var robotPattern = $('input[name="group1"]:checked');
+    currentPattern = robotPattern[0].value;
+    $("#robotPattern").text("Robot pattern: "+currentPattern);
+    $('patternListUpload').closeModal();
+    document.getElementById('fileID').click();
+});
+
+function selectPattern(listID) {
+    var list = document.createElement("form");
+    var content = document.getElementById(listID);
+    content.innerHTML = "";
+    var h = document.createElement("h4");
+    h.textContent = "Select Robot";
+    content.appendChild(h);
+    list.setAttribute('action', "#");
+    for (var i = 0; i < patternList.length; i++) {
+        var p = document.createElement('p');
+        var input = document.createElement('input');
+        input.setAttribute('name', 'group1');
+        input.setAttribute('type', 'radio');
+        input.setAttribute('id', 'test' + i);
+        input.setAttribute('value',patternList[i]);
+        var label = document.createElement('label');
+        label.setAttribute('for', 'test' + i);
+        label.textContent = patternList[i];
+        p.appendChild(input);
+        p.appendChild(label);
+        list.appendChild(p);
+    }
+    content.appendChild(list);
+}
+
 function cancelChooseFile() {
     var content = document.getElementById('list0');
     //when upload this will trigger a error and break the XHR
@@ -469,6 +511,7 @@ function uploadAndSubmit() {
     }
 
     if(beginURL != "") {
+        //use ajax to check the internet connectivity
         $.ajax({
             type: "GET",
             url: beginURL,
@@ -481,7 +524,6 @@ function uploadAndSubmit() {
                         var object = JSON.parse(body);
                         console.log(object);
                         if (object.successed) {
-                            var robotPattern = $('input[name="group2"]:checked').val();
                             var form = document.forms["uploadForm"];
                             var fileName = $("[name='file']#fileID").val().split('\\').pop();
                             //var fileName= $("[name='file']#fileID").val();
@@ -526,7 +568,6 @@ function uploadAndSubmit() {
                                         console.log(xhr.response);
                                     }
                                 };
-
                                 xhr.open("POST", uploadURL + file.name);
                                 xhr.send(file);
                             } else {

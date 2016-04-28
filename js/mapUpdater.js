@@ -8,8 +8,6 @@ var request = require('request'),
     http = require('http'),
     mkdirp = require('mkdirp');
 
-var restoreURL = "";
-//var downloadURL="http://127.0.0.1:8888/downloadMap";
 
 $('.modal-trigger').leanModal();
 $.ajax({

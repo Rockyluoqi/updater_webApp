@@ -85,12 +85,11 @@
                 </a>
                 <a class="waves-effect waves-light btn-large green modal-trigger tooltipped" id="download"
                    href="#patternList" data-position="bottom" data-delay="50" data-tooltip="下载固件包">Download firmware</a>
-                <a class="waves-effect waves-light btn-large amber darken-3 tooltipped" id="restore"
+                <a class="waves-effect waves-light btn-large amber darken-3 tooltipped" id="rollback"
                    data-position="bottom" data-delay="50" data-tooltip="恢复远程固件">Rollback</a>
                 <!--<button class="button dh" id="upload">Upload</button>-->
                 <a class="waves-effect waves-light btn-large blue tooltipped" id="chooseFileBtn" data-position="bottom"
-                   data-delay="50" data-tooltip="选择固件" href="#"
-                   onclick="document.getElementById('fileID').click();return false;">choose firmware</a>
+                   data-delay="50" data-tooltip="选择固件">choose firmware</a>
                 <a class="waves-effect waves-light btn-large tooltipped" id="uploadBtn" data-position="bottom"
                    data-delay="50" data-tooltip="上传选中固件" href="#"
                    onclick="document.getElementById('upload').click();return false;">push & update</a>
@@ -147,9 +146,27 @@
                 <!--</form>-->
             </div>
             <div class="modal-footer">
-                <a href="#!" class=" modal-action modal-close waves-effect waves-green btn-flat">cancel</a>
+                <a href="#!" class=" modal-action modal-close waves-effect waves-green btn-flat">Cancel</a>
                 <a href="#!" id="downloadSubmit" class=" modal-action modal-close waves-effect waves-green btn-flat"
-                   onclick="Materialize.toast('Downloading', 4000)">YES Download</a>
+                   onclick="Materialize.toast('Downloading', 4000)">Yes Download</a>
+            </div>
+        </div>
+        <div id="patternListRollback" class="modal modal-fixed-footer">
+            <div class="modal-content" id="list-content-rollback">
+
+            </div>
+            <div class="modal-footer">
+                <a href="#!" class=" modal-action modal-close waves-effect waves-green btn-flat">Cancel</a>
+                <a href="#!" onclick="restore()" class=" modal-action modal-close waves-effect waves-green btn-flat">Yes Rollback</a>
+            </div>
+        </div>
+        <div id="patternListUpload" class="modal modal-fixed-footer">
+            <div class="modal-content" id="list-content-upload">
+
+            </div>
+            <div class="modal-footer">
+                <a href="#!" class=" modal-action modal-close waves-effect waves-green btn-flat">Cancel</a>
+                <a href="#!" class=" modal-action modal-close waves-effect waves-green btn-flat" id="yesChoose">Yes choose file</a>
             </div>
         </div>
 
