@@ -35,7 +35,7 @@ var urlMap = {
     //
     //}
 };
-
+localStorage.setItem('page',"firmware");
 $('.modal-trigger').leanModal();
 
 /**
@@ -425,7 +425,7 @@ $('input[type=file]').change(function () {
         var li_1 = document.createElement('li');
         li_1.setAttribute('class', 'collection-item');
         var h = document.createElement('h5');
-        h.textContent = "Upload file list";
+        h.textContent = "Uploading ---> updating";
         li_1.appendChild(h);
         ul.appendChild(li_1);
 

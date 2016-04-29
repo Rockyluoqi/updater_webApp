@@ -19,6 +19,7 @@ var hostname = "192.168.1.88";
 var mapListURL = "";
 var urlStart = "";
 $('.modal-trigger').leanModal();
+localStorage.setItem('page',"map");
 $.ajax({
     url:beginURL,
     type:"GET",
