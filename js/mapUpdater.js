@@ -8,14 +8,10 @@ var request = require('request'),
     http = require('http'),
     mkdirp = require('mkdirp');
 
-var restoreURL = "";
+var ip = localStorage.getItem('ip');
 //var downloadURL="http://127.0.0.1:8888/downloadMap";
-var downloadURL="http://192.168.1.88:8088/gs-robot/data/download_map";
-var uploadURL = "http://192.168.1.88:8088/gs-robot/data/upload_map";
-var getMapListURL = "http://192.168.1.88:8080/gs-robot/data/maps";
-var beginURL = "http://192.168.1.88:8080/gs-robot/cmd/launch_map_loader";
-var overURL = "http://192.168.1.88:8080/gs-robot/cmd/shutdown_map_loader";
-var hostname = "192.168.1.88";
+
+var hostname = ip;
 var mapListURL = "";
 var urlStart = "";
 $('.modal-trigger').leanModal();
@@ -24,21 +20,29 @@ $.ajax({
     url:beginURL,
     type:"GET",
     success:function(data) {
-        console.log("start response"+data);
+        console.log("start response: "+data);
         if(data.errorCode === "") {
-            Materialize.toast("Mission start!", 4000);
+            Materialize.toast("Start successfully!", 4000);
         } else {
-            Materialize.toast("Start unsuccessfully!", 4000);
+            toastError("Start unsuccessfully!");
+            //Materialize.toast("<span style='color: #ff0000;font-size: 30px'>"+"Start unsuccessfully!"+"</span></div>", 4000);
         }
     },
     error: function(XMLHttpRequest, textStatus, errorThrown) {
-        console.log(textStatus);
+        console.log("mapupdater start error: "+textStatus);
         if(textStatus == 'error') {
-            Materialize.toast("Start module unsuccessfully!",6000);
-            Materialize.toast("Please connect to the Robot WI-FI first and refresh!",10000);
+            toastError("Start module unsuccessfully!");
+            toastError("Please connect to the Robot WI-FI first and refresh!");
+            //Materialize.toast("<span style='color: #ff0000;font-size: 30px'>"+"Start module unsuccessfully!"+"</span></div>",20000);
+            //Materialize.toast("<span style='color: #ff0000;font-size: 30px'>"+"Please connect to the Robot WI-FI first and refresh!"+"</span></div>",20000);
         }
     }
 });
+
+function toastError(string) {
+    var text =  "<span style='color: #ff0000;font-size: 30px'>"+string+"</span></div>";
+    Materialize.toast(text,20000);
+}
 /**
  * ===========================================================================================
  *                                    download project
@@ -52,7 +56,7 @@ function downloadFile(urlData,fileName,toast){
     //aLink.href = urlData;
     //aLink.dispatchEvent(evt);
 
-    $("#progressBar").css("visibility", "visible");
+    $("#mapProgressBar").css("visibility", "visible");
 
     //var file_name = url.parse(urlData).pathname.split('/').pop();
     //console.log('filename: ' + file_name);
@@ -77,7 +81,7 @@ function downloadFile(urlData,fileName,toast){
             out.write(data);
         }).on('end',function() {
             out.end();
-            $("#progressBar").css("visibility", "hidden");
+            $("#mapProgressBar").css("visibility", "hidden");
             Materialize.toast(fileName +toast, 4000);
             Materialize.toast(fileName + " is saved in map_download folder!", 6000);
         });
@@ -111,7 +115,7 @@ function getImageList() {
         type: "GET",
         dataType: "json",
         success: function (data) {
-            //console.log(data);
+            console.log("get map list response: "+data);
             localStorage["mapList"] = JSON.stringify(data);
         }
     });
@@ -172,7 +176,7 @@ document.getElementById('download').addEventListener('click', function () {
 });
 
 document.getElementById('downloadSubmit').addEventListener('click',function() {
-    $("#progressBar").css("visibility", "visible");
+    $("#mapProgressBar").css("visibility", "visible");
     var selectedMap = $('input[name="group1"]:checked');
     console.log(selectedMap.length);
     for(var i=0;i<selectedMap.length;i++) {
@@ -247,7 +251,7 @@ function uploadAndSubmit() {
     //var fileName = $("[name='file']#fileID").val().split('\\').pop();
     ////var fileName= $("[name='file']#fileID").val();
     //console.log(fileName);
-    $("#progressBar").css("visibility", "visible");
+    $("#mapProgressBar").css("visibility", "visible");
     if (form["file"].files.length > 0) {
 
         // 寻找表单域中的 <input type="file" ... /> 标签
@@ -278,15 +282,16 @@ function upload(file,i) {
     });
     // 请求完成时建立一个处理程序
     xhr.onload = function () {
-        console.log("response" + xhr.response);
+        console.log("upload map package response: " + xhr.response);
         var object = JSON.parse(xhr.response);
         if (object.successed) {
             // File(s) uploaded.
             Materialize.toast("Upload successfully!", 4000);
-            $("#progressBar").css("visibility", "hidden");
+            $("#mapProgressBar").css("visibility", "hidden");
         } else {
-            Materialize.toast("Upload unsuccessfully!", 4000);
-            $("#progressBar").css("visibility", "hidden");
+            toastError("Upload unsuccessfully!");
+            //Materialize.toast("Upload unsuccessfully!", 4000);
+            $("#mapProgressBar").css("visibility", "hidden");
         }
     };
 

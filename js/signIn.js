@@ -109,10 +109,11 @@ $(document).ready(function() {
       };
 
       $.ajax({
-          url:"http://rms.gs-robot.me/gs-rms-svr/customers/login",
+          url:
           type:"POST",
           dataType:"json",
           data: JSON.stringify(param),
+          async:false,
           success:function(data) {
               console.log(data);
               var sessionExpirationTime = data.data.sessionExpirationTime;
