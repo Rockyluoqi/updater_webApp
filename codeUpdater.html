@@ -13,7 +13,7 @@
     <script>window.Hammer = require('./js/lib/hammerjs');</script>
     <script type="text/javascript" src="js/lib/materialize.min.js"></script>
 
-    <title>Firmware_updater_Gaussian v0.0.1</title>
+    <title>Gaussian System Toolbox v0.1.0</title>
 </head>
 <body>
 <header class="header">
@@ -86,12 +86,12 @@
                 <a class="waves-effect waves-light btn-large green modal-trigger tooltipped" id="download"
                    href="#patternList" data-position="bottom" data-delay="50" data-tooltip="下载固件包">Download firmware</a>
                 <a class="waves-effect waves-light btn-large amber darken-3 tooltipped" id="rollback"
-                   data-position="bottom" data-delay="50" data-tooltip="恢复远程固件">Rollback</a>
+                   data-position="bottom" data-delay="50" data-tooltip="恢复机器人固件到上一个版本">Rollback</a>
                 <!--<button class="button dh" id="upload">Upload</button>-->
                 <a class="waves-effect waves-light btn-large blue tooltipped" id="chooseFileBtn" data-position="bottom"
-                   data-delay="50" data-tooltip="选择固件">choose firmware</a>
+                   data-delay="50" data-tooltip="选择已下载固件">choose firmware</a>
                 <a class="waves-effect waves-light btn-large tooltipped" id="uploadBtn" data-position="bottom"
-                   data-delay="50" data-tooltip="上传选中固件" href="#"
+                   data-delay="50" data-tooltip="将固件推送至机器人" href="#"
                    onclick="document.getElementById('upload').click();return false;">push & update</a>
                 <input id="fileID" type="file" accept=".gspkg" name="file" style="visibility: hidden"/>
                 <!--multiple="multiple"/>-->

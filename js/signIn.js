@@ -1,132 +1,148 @@
 // button ripple effect from @ShawnSauce 's pen http://codepen.io/ShawnSauce/full/huLEH
 $(document).ready(function() {
-  $(function(){
-    var animationLibrary = 'animate';
+    var url = "http://rms.gs-robot.com/gs-rms-svr/customers/login";
+    $(function(){
+        const isReachable = require('is-reachable');
 
-    $.easing.easeOutQuart = function (x, t, b, c, d) {
-      return -c * ((t=t/d-1)*t*t*t - 1) + b;
-    };
-    $('[ripple]:not([disabled],.disabled)')
-      .on('mousedown', function( e ){
-
-        var button = $(this);
-        var touch = $('<touch><touch/>');
-        var size = button.outerWidth() * 1.8;
-        var complete = false;
-
-        $(document)
-          .on('mouseup',function(){
-            var a = {
-              'opacity': '0'
-            };
-            if( complete === true ){
-              size = size * 1.33;
-              $.extend(a, {
-                'height': size + 'px',
-                'width': size + 'px',
-                'margin-top': -(size)/2 + 'px',
-                'margin-left': -(size)/2 + 'px'
-              });
+        isReachable(url, (err, reachable) => {
+            console.log("reachable err log: "+err);
+            console.log("reachable:?"+reachable);
+            if(reachable) {
+                //Materialize.toast("You can", 10000);
+            } else {
+                console.log()
+                alert("You can't sign in now. Please check the net connection and try again!");
             }
-
-            touch
-              [animationLibrary](a, {
-              duration: 500,
-              complete: function(){touch.remove();},
-              easing: 'swing'
-            });
-          });
-
-        touch
-          .addClass( 'touch' )
-          .css({
-            'position': 'absolute',
-            'top': e.pageY-button.offset().top + 'px',
-            'left': e.pageX-button.offset().left + 'px',
-            'width': '0',
-            'height': '0'
-          });
-
-        /* IE8 will not appendChild */
-        button.get(0).appendChild(touch.get(0));
-
-        touch
-          [animationLibrary]({
-          'height': size + 'px',
-          'width': size + 'px',
-          'margin-top': -(size)/2 + 'px',
-          'margin-left': -(size)/2 + 'px'
-        }, {
-          queue: false,
-          duration: 500,
-          'easing': 'easeOutQuart',
-          'complete': function(){
-            complete = true
-          }
+            //console.log(reachable);
+            //=> true
         });
-      });
-  });
+        var animationLibrary = 'animate';
 
-  var username = $('#username'),
-    password = $('#password'),
-    erroru = $('erroru'),
-    errorp = $('errorp'),
-    submit = $('#submit'),
-    udiv = $('#u'),
-    pdiv = $('#p');
+        $.easing.easeOutQuart = function (x, t, b, c, d) {
+            return -c * ((t=t/d-1)*t*t*t - 1) + b;
+        };
+        $('[ripple]:not([disabled],.disabled)')
+            .on('mousedown', function( e ){
 
-  username.blur(function() {
-    if (username.val() == '') {
-      udiv.attr('errr','');
-    } else {
-      udiv.removeAttr('errr');
-    }
-  });
+                var button = $(this);
+                var touch = $('<touch><touch/>');
+                var size = button.outerWidth() * 1.8;
+                var complete = false;
 
-  password.blur(function() {
-    if(password.val() == '') {
-      pdiv.attr('errr','');
-    } else {
-      pdiv.removeAttr('errr');
-    }
-  });
+                $(document)
+                    .on('mouseup',function(){
+                        var a = {
+                            'opacity': '0'
+                        };
+                        if( complete === true ){
+                            size = size * 1.33;
+                            $.extend(a, {
+                                'height': size + 'px',
+                                'width': size + 'px',
+                                'margin-top': -(size)/2 + 'px',
+                                'margin-left': -(size)/2 + 'px'
+                            });
+                        }
 
-  submit.on('click', function(event) {
-    event.preventDefault();
-    if (username.val() == '') {
-      udiv.attr('errr','');
-    } else {
-      udiv.removeAttr('errr');
-    }
-    if(password.val() == '') {
-      pdiv.attr('errr','');
-    } else {
-      pdiv.removeAttr('errr');
-    }
-      var param = {
-          email:username.val(),
-          password:password.val()
-      };
+                        touch
+                            [animationLibrary](a, {
+                            duration: 500,
+                            complete: function(){touch.remove();},
+                            easing: 'swing'
+                        });
+                    });
 
-      $.ajax({
-          url:
-          type:"POST",
-          dataType:"json",
-          data: JSON.stringify(param),
-          async:false,
-          success:function(data) {
-              console.log(data);
-              var sessionExpirationTime = data.data.sessionExpirationTime;
+                touch
+                    .addClass( 'touch' )
+                    .css({
+                        'position': 'absolute',
+                        'top': e.pageY-button.offset().top + 'px',
+                        'left': e.pageX-button.offset().left + 'px',
+                        'width': '0',
+                        'height': '0'
+                    });
 
-              if(data.errorCode === "") {
-                  sessionStorage.setItem("accessKey",data.data.accessKey);
-                  location.href = "selectModule.html";
-              }
-          }
-      });
+                /* IE8 will not appendChild */
+                button.get(0).appendChild(touch.get(0));
 
-    //if(username.val() === "123" && password.val() === "321") {
-    //  location.href = "../codeUpdater.html";
-    //}
-  });
+                touch
+                    [animationLibrary]({
+                    'height': size + 'px',
+                    'width': size + 'px',
+                    'margin-top': -(size)/2 + 'px',
+                    'margin-left': -(size)/2 + 'px'
+                }, {
+                    queue: false,
+                    duration: 500,
+                    'easing': 'easeOutQuart',
+                    'complete': function(){
+                        complete = true
+                    }
+                });
+            });
+    });
+
+    var username = $('#username'),
+        password = $('#password'),
+        erroru = $('erroru'),
+        errorp = $('errorp'),
+        submit = $('#submit'),
+        udiv = $('#u'),
+        pdiv = $('#p');
+
+    username.blur(function() {
+        if (username.val() == '') {
+            udiv.attr('errr','');
+        } else {
+            udiv.removeAttr('errr');
+        }
+    });
+
+    password.blur(function() {
+        if(password.val() == '') {
+            pdiv.attr('errr','');
+        } else {
+            pdiv.removeAttr('errr');
+        }
+    });
+
+    submit.on('click', function(event) {
+        event.preventDefault();
+        if (username.val() == '') {
+            udiv.attr('errr','');
+        } else {
+            udiv.removeAttr('errr');
+        }
+        if(password.val() == '') {
+            pdiv.attr('errr','');
+        } else {
+            pdiv.removeAttr('errr');
+        }
+        var param = {
+            email:username.val(),
+            password:password.val()
+        };
+
+
+        $.ajax({
+            url:"http://rms.gs-robot.com/gs-rms-svr/customers/login",
+            type:"POST",
+            dataType:"json",
+            data: JSON.stringify(param),
+            //async:false,
+            success:function(data) {
+                console.log(data);
+                var sessionExpirationTime = data.data.sessionExpirationTime;
+
+                if(data.errorCode === "") {
+                    sessionStorage.setItem("accessKey",data.data.accessKey);
+                    location.href = "selectModule.html";
+                }
+            }
+        });
+
+        //if(username.val() === "123" && password.val() === "321") {
+        //  location.href = "../codeUpdater.html";
+        //}
+    });
 });

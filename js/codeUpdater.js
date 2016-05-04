@@ -11,7 +11,32 @@ var request = require('request'),
 
 var ip = localStorage.getItem('ip');
 //default URLs
+var downloadURL = "http://download.gs-robot.com/system_package/";
+var getUpdatePathURL = "http://rms.gs-robot.com/gs-rms-svr/system_packages/";
 
+var restoreURL = "http://"+ip+":6789/gs-robot/system/rollback";
+var uploadURL = "http://"+ip+":6789/gs-robot/system/update_system/";
+var beginURL = "http://"+ip+":5678/gs-robot/cmd/launch_system_updater";
+var overURL = "http://"+ip+":5678/gs-robot/cmd/shutdown_system_updater";
+
+//鑫哥测试改下面这几的端口，ip在配置文件里修改，在应用程序目录下
+var urlMap = {
+    GS_AS_01: {
+        start_updater_api: "http://"+ip+":5678/gs-robot/cmd/launch_system_updater",
+        stop_updater_api: "http://"+ip+":5678/gs-robot/cmd/shutdown_system_updater",
+        update_api: "http://"+ip+":6789/gs-robot/system/update_system/",
+        rollback_api: "http://"+ip+":6789/gs-robot/system/rollback"
+    },
+    GS_SR_01:{
+        start_updater_api: "http://"+ip+":8080/gs-robot/cmd/launch_system_updater",
+        stop_updater_api: "http://"+ip+":8080/gs-robot/cmd/shutdown_system_updater",
+        update_api: "http://"+ip+":6789/gs-robot/system/update_system/",
+        rollback_api: "http://"+ip+":6789/gs-robot/system/rollback"
+    }
+    //GS_RR_01:{
+    //
+    //}
+};
 localStorage.setItem('page',"firmware");
 $('.modal-trigger').leanModal();
 
@@ -468,8 +493,8 @@ $('input[type=file]').change(function () {
         }
     } else {
         alert("Please choose a file.");
-        $("#uploadBtn").css("background-color", "#DFDFDF");
-        $("#uploadBtn").css("color", "#9F9F9F");
+        //$("#uploadBtn").css("background-color", "#DFDFDF");
+        //$("#uploadBtn").css("color", "#9F9F9F");
     }
 });
 

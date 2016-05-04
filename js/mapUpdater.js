@@ -10,7 +10,11 @@ var request = require('request'),
 
 var ip = localStorage.getItem('ip');
 //var downloadURL="http://127.0.0.1:8888/downloadMap";
-
+var downloadURL="http://"+ip+":8088/gs-robot/data/download_map";
+var uploadURL = "http://"+ip+":8088/gs-robot/data/upload_map";
+var getMapListURL = "http://"+ip+":8080/gs-robot/data/maps";
+var beginURL = "http://"+ip+":8080/gs-robot/cmd/launch_map_loader";
+var overURL = "http://"+ip+":8080/gs-robot/cmd/shutdown_map_loader";
 var hostname = ip;
 var mapListURL = "";
 var urlStart = "";
@@ -24,7 +28,7 @@ $.ajax({
         if(data.errorCode === "") {
             Materialize.toast("Start successfully!", 4000);
         } else {
-            toastError("Start unsuccessfully!");
+            //toastError("Start unsuccessfully!");
             //Materialize.toast("<span style='color: #ff0000;font-size: 30px'>"+"Start unsuccessfully!"+"</span></div>", 4000);
         }
     },
