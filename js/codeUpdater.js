@@ -389,7 +389,7 @@ function restore() {
                                 var object = JSON.parse(data);
                                 if (object.successed) {
                                     $("#firmwareProgressBar").css("visibility", "hidden");
-                                    Materialize.toast("Rollback successfully!", 4000);
+                                    Materialize.toast("Rollback successfully!", 8000);
                                 } else {
                                     $("#firmwareProgressBar").css("visibility", "hidden");
                                     toastError("Oops... Rollback unsuccessfully!");
@@ -413,7 +413,7 @@ function restore() {
         });
     } else {
         $("#firmwareProgressBar").css("visibility", "hidden");
-        Materialize.toast("You can't rollback now. Robot is not ready.", 10000);
+        toastError("You can't rollback now. Robot is not ready.");
     }
 }
 
@@ -445,7 +445,7 @@ function getAllFiles(root) {
 $('input[type=file]').change(function () {
     var robotPattern = $('input[name="group1"]:checked');
     currentPattern = robotPattern[0].value;
-    Materialize.toast("Please connect to the robot WI-FI before update", 8000);
+    toastError("Please connect to the robot WI-FI before update", 8000);
     var form = document.forms["uploadForm"];
     if (form["file"].files.length > 0) {
         $("#uploadBtn").css("background-color", "#2196F3");
@@ -547,7 +547,7 @@ function cancelChooseFile() {
     var content = document.getElementById('list0');
     //when upload this will trigger a error and break the XHR
     content.innerHTML = "";
-    Materialize.toast("Please choose file again", 4000);
+    toastError("Please choose file again", 4000);
     $("#uploadBtn").css("background-color", "#DFDFDF");
     $("#uploadBtn").css("color", "#9F9F9F");
 }
@@ -626,7 +626,7 @@ function uploadAndSubmit() {
                                         $("#firmwareProgressBar").css("visibility", "hidden");
                                     } else {
                                         document.getElementById('progress1').textContent = "Update unsuccessfully";
-                                        Materialize.toast("Oops...Update unsuccessfully", 4000);
+                                        toastError("Oops...Update unsuccessfully", 4000);
                                         $("#firmwareProgressBar").css("visibility", "hidden");
                                         console.log(xhr.response);
                                     }
@@ -646,13 +646,13 @@ function uploadAndSubmit() {
                 console.log("check connection response: "+textStatus);
                 $("#firmwareProgressBar").css("visibility", "hidden");
                 if (textStatus == 'error') {
-                    Materialize.toast("Please connect to the robot WI-FI first!", 10000);
+                    toastError("Please connect to the robot WI-FI first!", 10000);
                 }
             }
         });
     } else {
         $("#firmwareProgressBar").css("visibility", "hidden");
-        Materialize.toast("You can't update now. Robot is not ready.", 10000);
+        toastError("You can't update now. Robot is not ready.");
     }
 }
 

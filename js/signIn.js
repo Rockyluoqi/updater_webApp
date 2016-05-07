@@ -1,6 +1,9 @@
 // button ripple effect from @ShawnSauce 's pen http://codepen.io/ShawnSauce/full/huLEH
 $(document).ready(function() {
     var url = "http://rms.gs-robot.com/gs-rms-svr/customers/login";
+    document.getElementById('backBtn').addEventListener('click',function() {
+        location.href = "selectModule.html";
+    });
     $(function(){
         const isReachable = require('is-reachable');
 
@@ -10,7 +13,7 @@ $(document).ready(function() {
             if(reachable) {
                 //Materialize.toast("You can", 10000);
             } else {
-                console.log()
+                console.log();
                 alert("You can't sign in now. Please check the net connection and try again!");
             }
             //console.log(reachable);
@@ -136,7 +139,8 @@ $(document).ready(function() {
 
                 if(data.errorCode === "") {
                     sessionStorage.setItem("accessKey",data.data.accessKey);
-                    location.href = "selectModule.html";
+                    location.href = "codeUpdater.html";
+                    sessionStorage.setItem("isSignedIn","true");
                 }
             }
         });

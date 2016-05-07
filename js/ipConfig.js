@@ -9,24 +9,40 @@ function readConfig() {
         var object = JSON.parse(fileData);
         console.log("IP: "+object.ip);
         localStorage.setItem('ip',object.ip);
-        checkEditorModule();
+        checkReachable();
     });
 }
 
-function checkEditorModule() {
+function checkReachable() {
     var ip = localStorage.getItem('ip');
-    var checkURL = "http://"+ip+":8080/gs-robot/data/maps";
+    var checkEditorURL = "http://"+ip+":8080/gs-robot/data/maps";
+    var checkMapUpdaterURL = "http://"+ip+":8080/gs-robot/cmd/launch_map_loader";
 
     const isReachable = require('is-reachable');
 
-    isReachable(checkURL, (err, reachable) => {
+    //check editor module whether reachable
+    isReachable(checkEditorURL, (err, reachable) => {
         if(reachable) {
             $("#mapEditor").removeClass("disabled");
             document.getElementById('mapEditor').href = "./mapEditor/mapGallery.html";
         } else {
             $("#mapEditor").addClass("disabled");
             document.getElementById('mapEditor').href = "#";
-            Materialize.toast("You can't edit map now. Please check the net connection and try again! (Click the fresh button)", 10000);
+            toastError("You can't edit map now. <br/><br/> Please check the net connection and try again! <br/><br/> (Click the fresh button)", 10000);
+        }
+        //console.log(reachable);
+        //=> true
+    });
+
+    //check map updater module whether reachable
+    isReachable(checkMapUpdaterURL, (err, reachable) => {
+        if(reachable) {
+            $("#mapModule").removeClass("disabled");
+            document.getElementById('mapModule').href = "mapUpdater.html";
+        } else {
+            $("#mapModule").addClass("disabled");
+            document.getElementById('mapModule').href = "#";
+            toastError("You can't migrate map now. <br/><br/> Please check the net connection and try again! <br/><br/> (Click the fresh button)", 10000);
         }
         //console.log(reachable);
         //=> true
@@ -73,5 +89,18 @@ function checkEditorModule() {
     //    }
     //});
 }
+
+function toastError(string) {
+    var text =  "<span style='color: #ff0000;font-size: 30px'>"+string+"</span></div>";
+    Materialize.toast(text,20000);
+}
+
+document.getElementById('projectModule').addEventListener('click',function() {
+    if(sessionStorage.getItem("isSignedIn") === "true") {
+        location.href = "codeUpdater.html";
+    } else {
+        location.href = "signIn.html";
+    }
+});
 
 readConfig();

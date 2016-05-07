@@ -45,7 +45,7 @@ body header {
   padding: 10px;
   margin: 40px auto 80px auto;
   width: 400px;
-  height: 460px;
+  height: 500px;
   border-radius: 3px;
   background: white;
   box-shadow: 0 1px 5px 0 rgba(0,0,0,0.26);
@@ -278,6 +278,24 @@ button[type="submit"] {
   border-radius: 3px;
   cursor: pointer;
   background: rgb(3, 169, 245);
+  color: #fff;
+  box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.37);
+}
+
+#backBtn {
+  position: relative;
+  height: 40px;
+  width:200px;
+  float: right;
+  font-family: inherit;
+  font-weight: 100;
+  font-size: 20px;
+  border: 0;
+  margin: 3px 74px;
+  padding: 5px 50px;
+  border-radius: 3px;
+  cursor: pointer;
+  background: #00C853;
   color: #fff;
   box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.37);
 }
