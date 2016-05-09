@@ -445,7 +445,6 @@ function getAllFiles(root) {
 $('input[type=file]').change(function () {
     var robotPattern = $('input[name="group1"]:checked');
     currentPattern = robotPattern[0].value;
-    toastError("Please connect to the robot WI-FI before update", 8000);
     var form = document.forms["uploadForm"];
     if (form["file"].files.length > 0) {
         $("#uploadBtn").css("background-color", "#2196F3");
@@ -557,6 +556,7 @@ function clearList() {
     list.innerHTML = "";
 }
 
+var interval = null;
 function uploadAndSubmit() {
     event.preventDefault();
     //if(robotPattern === ) {
@@ -581,7 +581,66 @@ function uploadAndSubmit() {
                     console.log("start response: "+httpResponse);
                     console.log("start error: "+err);
                     $("#firmwareProgressBar").css("visibility", "visible");
-                    setTimeout(function () {
+                    //setTimeout(function () {
+                    //    var object = JSON.parse(body);
+                    //    console.log(object);
+                    //    if (object.successed) {
+                    //        var form = document.forms["uploadForm"];
+                    //        var fileName = $("[name='file']#fileID").val().split('\\').pop();
+                    //        //var fileName= $("[name='file']#fileID").val();
+                    //        console.log(fileName);
+                    //        $("#firmwareProgressBar").css("visibility", "visible");
+                    //        if (form["file"].files.length > 0) {
+                    //
+                    //            // 寻找表单域中的 <input type="file" ... /> 标签
+                    //            var file = form["file"].files[0];
+                    //
+                    //            //var formData = new FormData();
+                    //            //
+                    //            //for(var i=0;i<files.length;i++) {
+                    //            //  var file = files[i];
+                    //            //  formData.append(file.name, file);
+                    //            //}
+                    //
+                    //            var xhr = new XMLHttpRequest();
+                    //            (xhr.upload || xhr).addEventListener('progress', function (e) {
+                    //                var done = e.position || e.loaded;
+                    //                var total = e.totalSize || e.total;
+                    //                console.log('xhr progress: ' + Math.round(done / total * 100) + '%');
+                    //                //example update the progress data
+                    //                //$('#progress1').textContent = Math.round(done / total * 100) + '%';
+                    //                document.getElementById('progress1').textContent = Math.round(done / total * 100) + '%';
+                    //                if (done === total) {
+                    //                    document.getElementById('progress1').textContent = "Decompressing and installing";
+                    //                }
+                    //            });
+                    //            // 请求完成时建立一个处理程序。
+                    //            xhr.onload = function () {
+                    //                console.log("update response status: "+xhr.status);
+                    //                console.log("update response: "+xhr.response);
+                    //                var object = JSON.parse(xhr.response);
+                    //                if (object.successed) {
+                    //                    document.getElementById('progress1').textContent = "Update complete";
+                    //                    Materialize.toast("Update successfully", 4000);
+                    //                    Materialize.toast("If you want to use the updated features, please restart your robot.", 100000);
+                    //                    $("#firmwareProgressBar").css("visibility", "hidden");
+                    //                } else {
+                    //                    document.getElementById('progress1').textContent = "Update unsuccessfully";
+                    //                    toastError("Update unsuccessfully "+object.msg, 20000);
+                    //                    $("#firmwareProgressBar").css("visibility", "hidden");
+                    //                    console.log(xhr.response);
+                    //                }
+                    //            };
+                    //            xhr.open("POST", uploadURL + file.name);
+                    //            xhr.send(file);
+                    //        } else {
+                    //            alert("Please choose a file.");
+                    //            $("#uploadBtn").css("background-color", "#DFDFDF");
+                    //            $("#uploadBtn").css("color", "#9F9F9F");
+                    //        }
+                    //    }
+                    //}, 10000);
+                    interval = setInterval(function () {
                         var object = JSON.parse(body);
                         console.log(object);
                         if (object.successed) {
@@ -611,6 +670,7 @@ function uploadAndSubmit() {
                                     //$('#progress1').textContent = Math.round(done / total * 100) + '%';
                                     document.getElementById('progress1').textContent = Math.round(done / total * 100) + '%';
                                     if (done === total) {
+                                        clearInterval(interval);
                                         document.getElementById('progress1').textContent = "Decompressing and installing";
                                     }
                                 });
@@ -619,6 +679,7 @@ function uploadAndSubmit() {
                                     console.log("update response status: "+xhr.status);
                                     console.log("update response: "+xhr.response);
                                     var object = JSON.parse(xhr.response);
+                                    clearInterval(interval);
                                     if (object.successed) {
                                         document.getElementById('progress1').textContent = "Update complete";
                                         Materialize.toast("Update successfully", 4000);
@@ -626,7 +687,7 @@ function uploadAndSubmit() {
                                         $("#firmwareProgressBar").css("visibility", "hidden");
                                     } else {
                                         document.getElementById('progress1').textContent = "Update unsuccessfully";
-                                        toastError("Oops...Update unsuccessfully", 4000);
+                                        toastError("Update unsuccessfully "+object.msg, 20000);
                                         $("#firmwareProgressBar").css("visibility", "hidden");
                                         console.log(xhr.response);
                                     }
@@ -639,7 +700,7 @@ function uploadAndSubmit() {
                                 $("#uploadBtn").css("color", "#9F9F9F");
                             }
                         }
-                    }, 4000);
+                    }, 10000);
                 });
             },
             error: function (XMLHttpRequest, textStatus, errorThrown) {
