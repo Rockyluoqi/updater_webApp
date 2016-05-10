@@ -115,8 +115,8 @@ function downloadFile(urlData, toast) {
                 Materialize.toast(file_name + " is saved in firmware_download folder!", 8000);
             } else {
                 //if user cancel the download action, it'll break the request and delete the incomplete file
-                toastError(file_name + " download unsuccessfully!");
-                //Materialize.toast(file_name + " download unsuccessfully!", 4000);
+                toastError(file_name + " download failed!");
+                //Materialize.toast(file_name + " download failed!", 4000);
                 out.end();
                 console.log("delete file"+file_name);
                 fs.unlinkSync('./firmware_download/' +file_name);
@@ -168,8 +168,8 @@ function getPatternList() {
                 patternList = data;
             } else {
                 console.log(data);
-                toastError("Oops... Get robot list unsuccessfully.");
-                //Materialize.toast("Oops... Get robot list unsuccessfully.", 4000);
+                toastError("Oops... Get robot list failed.");
+                //Materialize.toast("Oops... Get robot list failed.", 4000);
             }
         }
     });
@@ -241,7 +241,7 @@ function download() {
             }
             showUpdateBtn();
             $("#firmwareProgressBar").css("visibility", "hidden");
-            toastError("Download unsuccessfully (no latest update in the server)");
+            toastError("Download failed (no latest update in the server)");
             toastError(object.message);
             //Materialize.toast("<span style='color: #ff0000;font-size: 30px'>"+""+"</span></div>",20000);
             //Materialize.toast("<span style='color: #ff0000;font-size: 30px'>"+object.message+"</span></div>",20000);
@@ -305,13 +305,13 @@ function download() {
                 downloadFile(downloadURL + object.data.pkg_file_url, ' is downloaded !');
             } else {
                 $("#firmwareProgressBar").css("visibility", "hidden");
-                toastError("Oops... Get UpdatePath unsuccessfully.");
-                //Materialize.toast("Oops... Get UpdatePath unsuccessfully.", 4000);
+                toastError("Oops... Get UpdatePath failed.");
+                //Materialize.toast("Oops... Get UpdatePath failed.", 4000);
             }
         }
     };
     xhr.open("GET", getUpdatePathURL + currentPattern + "/latest");
-    xhr.setRequestHeader("Gs-Client-Access-Key",sessionStorage.getItem("accessKey"));
+    xhr.setRequestHeader("Gs-Client-Access-Key",localStorage.getItem("accessKey"));
     xhr.setRequestHeader("Gs-Client-Type","DESKTOP_WEB");
     xhr.setRequestHeader("Gs-Language-Type","CN");
     xhr.send(null);
@@ -392,8 +392,8 @@ function restore() {
                                     Materialize.toast("Rollback successfully!", 8000);
                                 } else {
                                     $("#firmwareProgressBar").css("visibility", "hidden");
-                                    toastError("Oops... Rollback unsuccessfully!");
-                                    //Materialize.toast("Oops... Rollback unsuccessfully!", 4000);
+                                    toastError("Oops... Rollback failed!");
+                                    //Materialize.toast("Oops... Rollback failed!", 4000);
                                 }
                             }
                         });
@@ -557,11 +557,13 @@ function clearList() {
 }
 
 var interval = null;
+var intervalIsClosed = false;
 function uploadAndSubmit() {
     event.preventDefault();
     //if(robotPattern === ) {
     //    beginURL = "";
     //}
+    $('#uploadBtn').addClass('disabled');
     if(currentPattern === "GS-AS-01") {
         beginURL = urlMap.GS_AS_01.start_updater_api;
         uploadURL = urlMap.GS_AS_01.update_api;
@@ -625,8 +627,8 @@ function uploadAndSubmit() {
                     //                    Materialize.toast("If you want to use the updated features, please restart your robot.", 100000);
                     //                    $("#firmwareProgressBar").css("visibility", "hidden");
                     //                } else {
-                    //                    document.getElementById('progress1').textContent = "Update unsuccessfully";
-                    //                    toastError("Update unsuccessfully "+object.msg, 20000);
+                    //                    document.getElementById('progress1').textContent = "Update failed";
+                    //                    toastError("Update failed "+object.msg, 20000);
                     //                    $("#firmwareProgressBar").css("visibility", "hidden");
                     //                    console.log(xhr.response);
                     //                }
@@ -640,9 +642,12 @@ function uploadAndSubmit() {
                     //        }
                     //    }
                     //}, 10000);
+                    var object = JSON.parse(body);
+                    console.log(object);
+                    //setTimeout(function() {
+
+                    //ask for upload file every 3 seconds a time
                     interval = setInterval(function () {
-                        var object = JSON.parse(body);
-                        console.log(object);
                         if (object.successed) {
                             var form = document.forms["uploadForm"];
                             var fileName = $("[name='file']#fileID").val().split('\\').pop();
@@ -665,12 +670,15 @@ function uploadAndSubmit() {
                                 (xhr.upload || xhr).addEventListener('progress', function (e) {
                                     var done = e.position || e.loaded;
                                     var total = e.totalSize || e.total;
+                                    if(total != 0 && !intervalIsClosed) {
+                                        clearInterval(interval);
+                                        intervalIsClosed = true;
+                                    }
                                     console.log('xhr progress: ' + Math.round(done / total * 100) + '%');
                                     //example update the progress data
                                     //$('#progress1').textContent = Math.round(done / total * 100) + '%';
                                     document.getElementById('progress1').textContent = Math.round(done / total * 100) + '%';
                                     if (done === total) {
-                                        clearInterval(interval);
                                         document.getElementById('progress1').textContent = "Decompressing and installing";
                                     }
                                 });
@@ -679,17 +687,23 @@ function uploadAndSubmit() {
                                     console.log("update response status: "+xhr.status);
                                     console.log("update response: "+xhr.response);
                                     var object = JSON.parse(xhr.response);
-                                    clearInterval(interval);
+
+                                    $('#uploadBtn').removeClass('disabled');
+
+                                    //clearInterval(interval);
                                     if (object.successed) {
                                         document.getElementById('progress1').textContent = "Update complete";
                                         Materialize.toast("Update successfully", 4000);
                                         Materialize.toast("If you want to use the updated features, please restart your robot.", 100000);
                                         $("#firmwareProgressBar").css("visibility", "hidden");
+                                        intervalIsClosed = false;
+                                        return false;
                                     } else {
-                                        document.getElementById('progress1').textContent = "Update unsuccessfully";
-                                        toastError("Update unsuccessfully "+object.msg, 20000);
+                                        document.getElementById('progress1').textContent = "Update failed";
+                                        toastError("Update failed "+object.msg, 20000);
                                         $("#firmwareProgressBar").css("visibility", "hidden");
                                         console.log(xhr.response);
+                                        return false;
                                     }
                                 };
                                 xhr.open("POST", uploadURL + file.name);
@@ -700,7 +714,7 @@ function uploadAndSubmit() {
                                 $("#uploadBtn").css("color", "#9F9F9F");
                             }
                         }
-                    }, 10000);
+                    }, 3000);
                 });
             },
             error: function (XMLHttpRequest, textStatus, errorThrown) {

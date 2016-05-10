@@ -28,16 +28,16 @@ $.ajax({
         if(data.errorCode === "") {
             Materialize.toast("Start successfully!", 4000);
         } else {
-            //toastError("Start unsuccessfully!");
-            //Materialize.toast("<span style='color: #ff0000;font-size: 30px'>"+"Start unsuccessfully!"+"</span></div>", 4000);
+            //toastError("Start failed!");
+            //Materialize.toast("<span style='color: #ff0000;font-size: 30px'>"+"Start failed!"+"</span></div>", 4000);
         }
     },
     error: function(XMLHttpRequest, textStatus, errorThrown) {
         console.log("mapupdater start error: "+textStatus);
         if(textStatus == 'error') {
-            toastError("Start module unsuccessfully!");
+            toastError("Start module failed!");
             toastError("Please connect to the Robot WI-FI first and refresh!");
-            //Materialize.toast("<span style='color: #ff0000;font-size: 30px'>"+"Start module unsuccessfully!"+"</span></div>",20000);
+            //Materialize.toast("<span style='color: #ff0000;font-size: 30px'>"+"Start module failed!"+"</span></div>",20000);
             //Materialize.toast("<span style='color: #ff0000;font-size: 30px'>"+"Please connect to the Robot WI-FI first and refresh!"+"</span></div>",20000);
         }
     }
@@ -293,8 +293,8 @@ function upload(file,i) {
             Materialize.toast("Upload successfully!", 4000);
             $("#mapProgressBar").css("visibility", "hidden");
         } else {
-            toastError("Upload unsuccessfully!");
-            //Materialize.toast("Upload unsuccessfully!", 4000);
+            toastError("Upload failed!");
+            //Materialize.toast("Upload failed!", 4000);
             $("#mapProgressBar").css("visibility", "hidden");
         }
     };

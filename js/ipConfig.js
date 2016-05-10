@@ -95,12 +95,8 @@ function toastError(string) {
     Materialize.toast(text,20000);
 }
 
-document.getElementById('projectModule').addEventListener('click',function() {
-    if(sessionStorage.getItem("isSignedIn") === "true") {
-        location.href = "codeUpdater.html";
-    } else {
-        location.href = "signIn.html";
-    }
-});
+//document.getElementById('projectModule').addEventListener('click',function() {
+//    location.href = "codeUpdater.html";
+//});
 
 readConfig();
