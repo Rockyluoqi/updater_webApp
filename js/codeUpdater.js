@@ -19,7 +19,6 @@ var uploadURL = "http://"+ip+":6789/gs-robot/system/update_system/";
 var beginURL = "http://"+ip+":5678/gs-robot/cmd/launch_system_updater";
 var overURL = "http://"+ip+":5678/gs-robot/cmd/shutdown_system_updater";
 
-//鑫哥测试改下面这几的端口，ip在配置文件里修改，在应用程序目录下
 var urlMap = {
     GS_AS_01: {
         start_updater_api: "http://"+ip+":5678/gs-robot/cmd/launch_system_updater",
