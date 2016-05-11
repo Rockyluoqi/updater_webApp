@@ -7150,10 +7150,11 @@ nav ul a span.badge {
 
 nav {
     color: #fff;
-    background-color: #ee6e73;
+    background-color: #039be5;
     width: 100%;
     height: 56px;
-    line-height: 56px
+    line-height: 56px;
+    opacity: 0.5;
 }
 
 nav a {
@@ -7196,7 +7197,7 @@ nav .brand-logo {
     color: #fff;
     display: inline-block;
     font-size: 2.1rem;
-    padding: 0;
+    padding-left: 25px;
     white-space: nowrap
 }
 

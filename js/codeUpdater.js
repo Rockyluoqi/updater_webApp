@@ -218,7 +218,7 @@ document.getElementById('downloadSubmit').addEventListener('click', function () 
 });
 
 function toastError(string) {
-    var text =  "<span style='color: #ff0000;font-size: 30px'>"+string+"</span></div>";
+    var text =  "<span style='color: #ff0000;font-size: 25px'>"+string+"</span></div>";
     Materialize.toast(text,20000);
 }
 
@@ -705,6 +705,9 @@ function uploadAndSubmit() {
                                         return false;
                                     }
                                 };
+                                xhr.onerror = function() {
+                                    $("#firmwareProgressBar").css("visibility", "hidden");
+                                };
                                 xhr.open("POST", uploadURL + file.name);
                                 xhr.send(file);
                             } else {
@@ -740,7 +743,7 @@ function back() {
     if(currentPattern === "GS-AS-01") {
         overURL = urlMap.GS_AS_01.stop_updater_api;
     } else if(currentPattern = "GS_SR_01") {
-        //overURL = urlMap.GS_AS_01.stop_updater_api;
+        overURL = urlMap.GS_SR_01.stop_updater_api;
     }
     $.ajax({
         url: overURL,
@@ -751,3 +754,8 @@ function back() {
     });
     location.href = "selectModule.html";
 }
+
+document.getElementById('resignIn').addEventListener('click',function() {
+    localStorage.removeItem("isSignedIn");
+    location.href = 'signIn.html';
+});

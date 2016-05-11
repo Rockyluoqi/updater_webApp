@@ -19,7 +19,7 @@ $(document).ready(function() {
             //console.log(reachable);
             //=> true
         });
-
+        
         if(localStorage.getItem('isSignedIn')) {
             if(!ifNeedSignIn()) {
                 location.href = 'selectModule.html';

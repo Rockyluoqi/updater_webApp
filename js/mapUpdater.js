@@ -44,7 +44,7 @@ $.ajax({
 });
 
 function toastError(string) {
-    var text =  "<span style='color: #ff0000;font-size: 30px'>"+string+"</span></div>";
+    var text =  "<span style='color: #ff0000;font-size: 25px'>"+string+"</span></div>";
     Materialize.toast(text,20000);
 }
 /**
@@ -316,3 +316,8 @@ function back() {
     });
     location.href = "selectModule.html";
 }
+
+document.getElementById('resignIn').addEventListener('click',function() {
+    localStorage.removeItem("isSignedIn");
+    location.href = 'signIn.html';
+});
