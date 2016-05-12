@@ -2,6 +2,7 @@
  * Created by Luoqi on 4/29/2016.
  */
 var fs = require("fs");
+
 function readConfig() {
     fs.readFile("./ipConfig.json","utf-8",function(error, fileData){
         console.log("error "+error);
@@ -47,47 +48,6 @@ function checkReachable() {
         //console.log(reachable);
         //=> true
     });
-
-    //const http = require('http');
-    //var isOnline = require('is-online');
-    //
-    //isOnline(function(err, online) {
-    //    console.log(err);
-    //    console.log(online);
-    //    //=> true
-    //});
-    //var options = {
-    //    hostname:ip,
-    //    port:8080,
-    //    path: "/gs-robot/data/maps"
-    //};
-    //
-    //http.get(options,function(res){
-    //    if(res.statusCode === 200) {
-    //        console.log("map editor success");
-    //    } else {
-    //        console.log("Got error: ");
-    //    }
-    //});//on('error', function(e) {
-    //    console.log("Got error: " + e.message);
-    //});
-
-    //$.ajax({
-    //    url:checkURL,
-    //    type:"GET",
-    //    dataType:'json',
-    //    success:function(data){
-    //        console.log(data);
-    //        $("#mapEditor").css("visibility", "visible");
-    //    },
-    //    error: function (XMLHttpRequest, textStatus, errorThrown) {
-    //        console.log("check connection response: "+textStatus);
-    //        $("#mapEditor").css("visibility", "hidden");
-    //        if (textStatus == 'error') {
-    //            Materialize.toast("You can't edit map now. Please check the net connection.", 10000);
-    //        }
-    //    }
-    //});
 }
 
 function toastError(string) {
@@ -102,6 +62,26 @@ document.getElementById('resignIn').addEventListener('click',function() {
 
 document.getElementById('reload').addEventListener('click', function () {
     checkReachable();
+});
+
+document.getElementById('projectModule').addEventListener('click',goProjectModule);
+var eventSum = 0;
+function goProjectModule() {
+    console.log('firmware update');
+    // if($('#backBtn').length) {
+    //     document.getElementById('backBtn').setAttribute('id','backBtn1');
+    // }
+    $('#content1').fadeOut('fast', function() {
+        $(this).load('codeUpdater.html', function() {
+            // $('#nav').remove();
+            $(this).fadeIn('fast')  ;
+        });
+    });
+}
+
+document.getElementById('backBtn').addEventListener('click',function() {
+    // localStorage.removeItem("isSignedIn");
+    // location.href = 'signIn.html';
 });
 
 //document.getElementById('projectModule').addEventListener('click',function() {

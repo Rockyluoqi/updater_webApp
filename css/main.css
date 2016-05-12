@@ -327,13 +327,13 @@ top:2px;
     margin-left:30px;
 }
 
-#backBtn {
-    margin-top: 30px;
-    width: 60px;
-    height: 60px;
-    left: 9px;
-    padding: 7px;
-}
+/*#backBtn {*/
+/*margin-top: 30px;*/
+/*width: 60px;*/
+/*height: 60px;*/
+/*left: 9px;*/
+/*padding: 7px;*/
+/*}*/
 
 #refreshBtn {
     margin-top: 30px;
@@ -378,7 +378,7 @@ top:2px;
     position: absolute;
     z-index: 10;
     visibility: hidden;
-    margin-left: 153px;
+    margin-left: 10px;
     margin-top: 30px
 }
 
@@ -386,7 +386,7 @@ top:2px;
     position: absolute;
     z-index: 10;
     visibility: hidden;
-    margin-left: 84px;
+    margin-left: 10px;
     margin-top: 30px
 }
 

@@ -739,7 +739,8 @@ function uploadAndSubmit() {
  * ===========================================================================================
  */
 function back() {
-    console.log("back");
+    eventSum += 1;
+    console.log('back');
     if(currentPattern === "GS-AS-01") {
         overURL = urlMap.GS_AS_01.stop_updater_api;
     } else if(currentPattern = "GS_SR_01") {
@@ -752,7 +753,24 @@ function back() {
             console.log(data);
         }
     });
-    location.href = "selectModule.html";
+
+    $('#content1').fadeOut('fast', function() {
+        $(this).load('selectModule.html #content1', function() {
+            // if($('#backBtn1').length) {
+            //     document.getElementById('backBtn1').setAttribute('id','backBtn');
+            // }
+            checkReachable();
+            document.getElementById('projectModule').addEventListener('click',goProjectModule);
+            // document.getElementById('backBtn').removeEventListener('click',false);
+            $(this).fadeIn('fast');
+        });
+    });
+    // location.href = "selectModule.html";
+}
+
+//binding so many times will occur horrible error, use eventSum var control the binding
+if(eventSum === 0) {
+    document.getElementById('backBtn').addEventListener('click', back);
 }
 
 document.getElementById('resignIn').addEventListener('click',function() {
