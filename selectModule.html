@@ -35,6 +35,23 @@
         <a href="#!" class="brand-logo" >FUNCTION SELECTION</a>
         <ul class="right hide-on-med-and-down">
             <li>
+                <a id="modelLabel" href="#!" style="font-size:20px;" >Current model: </a>
+            </li>
+            <li>
+            </li>
+            <li>
+                <a class="tooltipped" data-position="bottom" data-delay="50" data-tooltip="Select robot model" id="reselectModel" style="font-size: 20px;">Select model
+                    <!--<svg fill="#FFFFFF" height="36" viewBox="0 0 24 24" width="36" xmlns="http://www.w3.org/2000/svg" style="padding: 20px;">-->
+                    <!--<path d="M7 10l5 5 5-5z"/>-->
+                    <!--<path d="M0 0h24v24H0z" fill="none"/>-->
+                    <!--</svg>-->
+                    <svg fill="#FFFFFF" height="36" viewBox="0 0 24 24" width="36" xmlns="http://www.w3.org/2000/svg" style="padding-left:10px;padding-bottom:20px;padding-top: 20px;">
+                        <path d="M0 0h24v24H0z" fill="none"/>
+                        <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+                    </svg>
+                </a>
+            </li>
+            <li>
                 <a class="tooltipped" data-position="bottom" data-delay="50" data-tooltip="Reload this page" id="reload" style="padding-top: 10px;height: 65px">
                     <svg fill="#FFFFFF" height="36" viewBox="0 0 24 24" width="36" xmlns="http://www.w3.org/2000/svg">
                         <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
@@ -54,9 +71,17 @@
     </div>
 </nav>
 
+<!--<ul id="dropdown1" class="dropdown-content">-->
+<!--<li><a href="#!">one</a></li>-->
+<!--<li class="divider"></li>-->
+<!--<li><a href="#!">two</a></li>-->
+<!--<li class="divider"></li>-->
+<!--<li><a href="#!">three</a></li>-->
+<!--</ul>-->
+
 <div class="content" id="content1">
     <a class="btn-large waves-effect waves-light blue" id="projectModule">firmware Update</a>
-    <a class="btn-large waves-effect waves-light blue" id="mapModule" href="mapUpdater.html">map migration</a>
+    <a class="btn-large waves-effect waves-light blue" id="mapModule">map migration</a>
     <a class="btn-large waves-effect waves-light blue" id="mapEditor" href="./mapEditor/mapGallery.html">map edit</a>
     <!--<div class="fixed-action-btn" id="refreshBtn_selection" style="top:100px;right:80px;">-->
     <!--<a class="btn-floating btn-large waves-effect waves-light blue" onclick="location.reload();" style="padding-top: 9px">-->
@@ -66,6 +91,29 @@
     <!--</svg>-->
     <!--</a>-->
     <!--</div>-->
+</div>
+
+<div id="modelList" class="modal modal-fixed-footer">
+    <div class="modal-content" id="list-content">
+        <!--<form action="#">-->
+        <!--<p>-->
+        <!--<input name="group1" type="radio" id="test1"/>-->
+        <!--<label for="test1">X1</label>-->
+        <!--</p>-->
+        <!--<p>-->
+        <!--<input name="group1" type="radio" id="test2"/>-->
+        <!--<label for="test2">X3</label>-->
+        <!--</p>-->
+        <!--<p>-->
+        <!--<input name="group1" type="radio" id="test3"/>-->
+        <!--<label for="test3">X5</label>-->
+        <!--</p>-->
+        <!--</form>-->
+    </div>
+    <div class="modal-footer">
+        <a href="#!" class=" modal-action modal-close waves-effect waves-green btn-flat">Cancel</a>
+        <a href="#!" id="chooseModelBtn" class=" modal-action modal-close waves-effect waves-green btn-flat">Yes</a>
+    </div>
 </div>
 
 

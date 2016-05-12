@@ -8,18 +8,14 @@ var request = require('request'),
     http = require('http'),
     mkdirp = require('mkdirp');
 
-var ip = localStorage.getItem('ip');
-//var downloadURL="http://127.0.0.1:8888/downloadMap";
-var downloadURL="http://"+ip+":8088/gs-robot/data/download_map";
-var uploadURL = "http://"+ip+":8088/gs-robot/data/upload_map";
-var getMapListURL = "http://"+ip+":8080/gs-robot/data/maps";
-var beginURL = "http://"+ip+":8080/gs-robot/cmd/launch_map_loader";
-var overURL = "http://"+ip+":8080/gs-robot/cmd/shutdown_map_loader";
-var hostname = ip;
-var mapListURL = "";
-var urlStart = "";
+var host = localStorage.getItem('host');
+var downloadURL= host + ":8088/gs-robot/data/download_map";
+var uploadURL = host+":8088/gs-robot/data/upload_map";
+var getMapListURL = host+":8080/gs-robot/data/maps";
+var beginURL = host+":8080/gs-robot/cmd/launch_map_loader";
+var overURL = host+":8080/gs-robot/cmd/shutdown_map_loader";
+var hostname = host;
 $('.modal-trigger').leanModal();
-localStorage.setItem('page',"map");
 $.ajax({
     url:beginURL,
     type:"GET",
@@ -33,6 +29,7 @@ $.ajax({
         }
     },
     error: function(XMLHttpRequest, textStatus, errorThrown) {
+        $("#mapProgressBar").css("visibility", "hidden");
         console.log("mapupdater start error: "+textStatus);
         if(textStatus == 'error') {
             toastError("Start module failed!");
@@ -88,6 +85,9 @@ function downloadFile(urlData,fileName,toast){
             $("#mapProgressBar").css("visibility", "hidden");
             Materialize.toast(fileName +toast, 4000);
             Materialize.toast(fileName + " is saved in map_download folder!", 6000);
+        }).on('error',function() {
+            $("#mapProgressBar").css("visibility", "hidden");
+            toastError("Download map failed!");
         });
     });
 }
@@ -98,15 +98,15 @@ function downloadFile(urlData,fileName,toast){
  * test
  * @type {Array}
  */
-//var patternList = [];
-//function getPatternList() {
+//var modelList = [];
+//function getModelList() {
 //    $.ajax({
 //        url:,
 //        type:"get",
 //        dataType:"json",
 //        async:false,
 //        success: function(data) {
-//            patternList = data;
+//            modelList = data;
 //        }
 //    });
 //}
@@ -136,13 +136,13 @@ function parseMapList() {
     }
     return mapDataArray;
 }
-var patternList = [];
+var modelList = [];
 document.getElementById('download').addEventListener('click', function () {
     getImageList();
-    patternList = [];
-    patternList = parseMapList();
-    //getPatternList();
-    console.log(patternList);
+    modelList = [];
+    modelList = parseMapList();
+    //getModelList();
+    console.log(modelList);
 
     fs.stat('./map_download',function(err,stat) {
         if(err === null) {
@@ -161,17 +161,17 @@ document.getElementById('download').addEventListener('click', function () {
     h.innerText = "Select map";
     content.appendChild(h);
     list.setAttribute('action', "#");
-    for(var i=0;i<patternList.length;i++) {
+    for(var i=0;i<modelList.length;i++) {
         var p = document.createElement('p');
         var input = document.createElement('input');
         input.setAttribute('name', 'group1');
         //support multiple selection
         input.setAttribute('type', 'checkbox');
         input.setAttribute('id', 'test' + i);
-        input.setAttribute('value',patternList[i]);
+        input.setAttribute('value',modelList[i]);
         var label = document.createElement('label');
         label.setAttribute('for', 'test' + i);
-        label.innerText = patternList[i];
+        label.innerText = modelList[i];
         p.appendChild(input);
         p.appendChild(label);
         list.appendChild(p);
@@ -188,15 +188,10 @@ document.getElementById('downloadSubmit').addEventListener('click',function() {
         //downloadFile("" + value,' is downloaded !');
         downloadFile(downloadURL+"?mapName="+selectedMap[i].value, selectedMap[i].value, ' is downloaded !');
     }
-    //downloadFile("url"+robotPattern+".zip",' is downloaded !');
+    //downloadFile("url"+robotModel+".zip",' is downloaded !');
     //downloadFile("http://127.0.0.1:8888/robot1package",' is downloaded !');
 });
 
-document.getElementById("refreshBtn").addEventListener('click', refresh);
-
-function refresh() {
-    location.reload();
-}
 /**
  * ===========================================================================================
  *                                         Upload
@@ -298,15 +293,26 @@ function upload(file,i) {
             $("#mapProgressBar").css("visibility", "hidden");
         }
     };
+    xhr.onerror = function() {
+        $("#mapProgressBar").css("visibility", "hidden");
+        toastError('Upload failed!');
+    };
 
     var fileName = file.name.split(".")[0];
     console.log("fileName:"+file.name+" "+fileName);
     xhr.open("POST", uploadURL+"?map_name="+fileName);
     xhr.send(file);
 }
+/**
+ * ===========================================================================================
+ *                                          Go back
+ * ===========================================================================================
+ */
 
 function back() {
+    mapBackEventSum = 1;
     console.log("back");
+
     $.ajax({
         url:overURL,
         type:"GET",
@@ -314,10 +320,27 @@ function back() {
             console.log("shut down response: "+data);
         }
     });
-    location.href = "selectModule.html";
+
+    $('#content1').fadeOut('fast', function() {
+        $(this).load('selectModule.html #content1', function() {
+            // checkReachable();
+            document.getElementById('mapModule').addEventListener('click',goMapModule);
+            document.getElementById('projectModule').addEventListener('click',goProjectModule);
+            // document.getElementById('backBtn').removeEventListener('click',false);
+            $(this).fadeIn('fast');
+        });
+    });
+
+    // location.href = "selectModule.html";
+}
+
+if(mapBackEventSum === 0) {
+    document.getElementById('backBtn').addEventListener('click', back);
 }
 
 document.getElementById('resignIn').addEventListener('click',function() {
-    localStorage.removeItem("isSignedIn");
+    if(localStorage.getItem('isSignIn')!=null) {
+        localStorage.removeItem("isSignedIn");
+    }
     location.href = 'signIn.html';
 });

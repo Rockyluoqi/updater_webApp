@@ -205,7 +205,6 @@ $(document).ready(function() {
 
                     localStorage.setItem("accessKey",data.data.accessKey);
                     location.href = "selectModule.html";
-                    sessionStorage.setItem("isSignedIn","true");
                     localStorage.setItem("isSignedIn","true");
                 }
             }

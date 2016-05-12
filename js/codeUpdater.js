@@ -9,35 +9,39 @@ var request = require('request'),
     os = require('os'),
     dns = require('dns');
 
-var ip = localStorage.getItem('ip');
+var host = localStorage.getItem('host');
 //default URLs
 var downloadURL = "http://download.gs-robot.com/system_package/";
 var getUpdatePathURL = "http://rms.gs-robot.com/gs-rms-svr/system_packages/";
 
-var restoreURL = "http://"+ip+":6789/gs-robot/system/rollback";
-var uploadURL = "http://"+ip+":6789/gs-robot/system/update_system/";
-var beginURL = "http://"+ip+":5678/gs-robot/cmd/launch_system_updater";
-var overURL = "http://"+ip+":5678/gs-robot/cmd/shutdown_system_updater";
+var restoreURL = host+":6789/gs-robot/system/rollback";
+var uploadURL = host+":6789/gs-robot/system/update_system/";
+var beginURL = host+":5678/gs-robot/cmd/launch_system_updater";
+var overURL = host+":5678/gs-robot/cmd/shutdown_system_updater";
 
-var urlMap = {
-    GS_AS_01: {
-        start_updater_api: "http://"+ip+":5678/gs-robot/cmd/launch_system_updater",
-        stop_updater_api: "http://"+ip+":5678/gs-robot/cmd/shutdown_system_updater",
-        update_api: "http://"+ip+":6789/gs-robot/system/update_system/",
-        rollback_api: "http://"+ip+":6789/gs-robot/system/rollback"
-    },
-    GS_SR_01:{
-        start_updater_api: "http://"+ip+":8080/gs-robot/cmd/launch_system_updater",
-        stop_updater_api: "http://"+ip+":8080/gs-robot/cmd/shutdown_system_updater",
-        update_api: "http://"+ip+":6789/gs-robot/system/update_system/",
-        rollback_api: "http://"+ip+":6789/gs-robot/system/rollback"
-    }
-    //GS_RR_01:{
-    //
-    //}
-};
+// var urlMap = {
+//     GS_AS_01: {
+//         start_updater_api: "http://"+ip+":5678/gs-robot/cmd/launch_system_updater",
+//         stop_updater_api: "http://"+ip+":5678/gs-robot/cmd/shutdown_system_updater",
+//         update_api: "http://"+ip+":6789/gs-robot/system/update_system/",
+//         rollback_api: "http://"+ip+":6789/gs-robot/system/rollback"
+//     },
+//     GS_SR_01:{
+//         start_updater_api: "http://"+ip+":8080/gs-robot/cmd/launch_system_updater",
+//         stop_updater_api: "http://"+ip+":8080/gs-robot/cmd/shutdown_system_updater",
+//         update_api: "http://"+ip+":6789/gs-robot/system/update_system/",
+//         rollback_api: "http://"+ip+":6789/gs-robot/system/rollback"
+//     }
+//     //GS_RR_01:{
+//     //
+//     //}
+// };
+
+var urlMap = JSON.parse(localStorage.getItem('ipConfig'));
+
+
 localStorage.setItem('page',"firmware");
-$('.modal-trigger').leanModal();
+// $('.modal-trigger').leanModal();
 
 /**
  * ===========================================================================================
@@ -155,16 +159,16 @@ function toDecimal2(x) {
 
 //var $upload = $('#upload');
 //$upload.('change',onFileInputChange,false);
-var patternList = ["GS-AS-01","GS-SR-01"];
-function getPatternList() {
+// var modelList = ["GS-AS-01","GS-SR-01"];
+function getModelList() {
     $.ajax({
-        url: getPatternListURL,
+        url: getModelListURL,
         type: "GET",
         dataType: "json",
         async: false,
         success: function (data) {
             if(data.successed) {
-                patternList = data;
+                modelList = data;
             } else {
                 console.log(data);
                 toastError("Oops... Get robot list failed.");
@@ -175,9 +179,10 @@ function getPatternList() {
 }
 
 document.getElementById('download').addEventListener('click', function () {
-    //patternList = [];
-    //getPatternList();
-    //console.log(patternList);
+    console.log("download");
+    //modelList = [];
+    //getModelList();
+    //console.log(modelList);
 
     //check if firmware_download is existed, if not it'll create a new folder
     fs.stat('./firmware_download', function (err, stat) {
@@ -189,16 +194,17 @@ document.getElementById('download').addEventListener('click', function () {
             });
         }
     });
-
-    selectPattern('list-content');
+    downloadSubmit();
+    // selectModel('list-content');
 });
 
-//function clearPatternList() {
+//function clearModelList() {
 //    var list = document.getElementById('listContainer');
 //    list.innerHTML = "";
 //}
-var currentPattern ="";
-document.getElementById('downloadSubmit').addEventListener('click', function () {
+var currentModel ="";
+
+function downloadSubmit() {
     hideUpdateBtn();
     $.ajax({
         type: "GET",
@@ -215,18 +221,37 @@ document.getElementById('downloadSubmit').addEventListener('click', function () 
             }
         }
     });
-});
+}
+// document.getElementById('downloadSubmit').addEventListener('click', function () {
+//     hideUpdateBtn();
+//     $.ajax({
+//         type: "GET",
+//         url: "http://www.baidu.com",
+//         success: function(data){
+//             download();
+//         },
+//         error: function(XMLHttpRequest, textStatus, errorThrown) {
+//             showUpdateBtn();
+//             console.log(errorThrown);
+//             console.log(textStatus);
+//             if(textStatus == 'error') {
+//                 toastError("Please connect to the Internet first!");
+//             }
+//         }
+//     });
+// });
 
 function toastError(string) {
     var text =  "<span style='color: #ff0000;font-size: 25px'>"+string+"</span></div>";
-    Materialize.toast(text,20000);
+    Materialize.toast(text,10000);
 }
 
 function download() {
     $("#firmwareProgressBar").css("visibility", "visible");
-    var robotPattern = $('input[name="group1"]:checked');
-    currentPattern = robotPattern[0].value;
-    $("#robotPattern").text("Robot pattern: "+currentPattern);
+    // var robotModel = $('input[name="group1"]:checked');
+    // currentModel = robotModel[0].value;
+    currentModel = localStorage.getItem('currentModel');
+    $("#robotModel").text("Robot model: "+currentModel);
     var xhr = new XMLHttpRequest();
 
     xhr.onload = function () {
@@ -301,6 +326,7 @@ function download() {
 
                 document.getElementById('close1').addEventListener("click", cancelAndDelete);
 
+                console.log(downloadURL + object.data.pkg_file_url);
                 downloadFile(downloadURL + object.data.pkg_file_url, ' is downloaded !');
             } else {
                 $("#firmwareProgressBar").css("visibility", "hidden");
@@ -309,7 +335,7 @@ function download() {
             }
         }
     };
-    xhr.open("GET", getUpdatePathURL + currentPattern + "/latest");
+    xhr.open("GET", getUpdatePathURL + currentModel + "/latest");
     xhr.setRequestHeader("Gs-Client-Access-Key",localStorage.getItem("accessKey"));
     xhr.setRequestHeader("Gs-Client-Type","DESKTOP_WEB");
     xhr.setRequestHeader("Gs-Language-Type","CN");
@@ -343,12 +369,12 @@ function deleteAll(files) {
  * ===========================================================================================
  */
 document.getElementById('rollback').addEventListener('click', function () {
-    if(currentPattern === "") {
-        selectPattern('list-content-rollback');
-        $('#patternListRollback').openModal();
-    } else {
+    // if(currentModel === "") {
+    //     selectModel('list-content-rollback');
+    //     $('#modelListRollback').openModal();
+    // } else {
         restore();
-    }
+    // }
     ////删除目录下的所有文件
     //var files = getAllFiles('./download');
     //for (let value of files) {
@@ -360,18 +386,11 @@ document.getElementById('rollback').addEventListener('click', function () {
 });
 
 function restore() {
-    var robotPattern = $('input[name="group1"]:checked');
-    currentPattern = robotPattern[0].value;
-    $("#robotPattern").text("Robot pattern: "+currentPattern);
-
+    currentModel = localStorage.getItem('currentModel');
     $("#firmwareProgressBar").css("visibility", "visible");
-    if (currentPattern === "GS-AS-01") {
-        beginURL = urlMap.GS_AS_01.start_updater_api;
-        restoreURL = urlMap.GS_AS_01.rollback_api;
-    } else if (currentPattern = "GS_SR_01") {
-        beginURL = urlMap.GS_SR_01.start_updater_api;
-        restoreURL = urlMap.GS_SR_01.rollback_api;
-    }
+    var object = JSON.parse(localStorage.getItem('ipConfig'));
+    beginURL = object[currentModel].start_updater_api;
+    restoreURL = object[currentModel].rollback_api;
 
     if (beginURL != "") {
         $.ajax({
@@ -404,10 +423,6 @@ function restore() {
                 console.log("check connection response:"+textStatus);
                 $("#firmwareProgressBar").css("visibility", "hidden");
                 toastError("Please connect to the robot WI-FI first!");
-                //Materialize.toast("Please connect to the robot WI-FI first!", 10000);
-                if (textStatus == 'error') {
-                    Materialize.toast("Please connect to the robot WI-FI first!", 10000);
-                }
             }
         });
     } else {
@@ -442,8 +457,7 @@ function getAllFiles(root) {
  */
 //show selected files in a list
 $('input[type=file]').change(function () {
-    var robotPattern = $('input[name="group1"]:checked');
-    currentPattern = robotPattern[0].value;
+    currentModel = localStorage.getItem('currentModel');
     var form = document.forms["uploadForm"];
     if (form["file"].files.length > 0) {
         $("#uploadBtn").css("background-color", "#2196F3");
@@ -497,26 +511,11 @@ $('input[type=file]').change(function () {
 });
 
 document.getElementById("chooseFileBtn").addEventListener('click',function() {
-    if(currentPattern === "") {
-        selectPattern("list-content-upload");
-        $('#patternListUpload').openModal();
-    } else {
-        var robotPattern = $('input[name="group1"]:checked');
-        currentPattern = robotPattern[0].value;
-        $("#robotPattern").text("Robot pattern: "+currentPattern);
-        document.getElementById('fileID').click();
-    }
-});
-
-document.getElementById('yesChoose').addEventListener('click',function() {
-    var robotPattern = $('input[name="group1"]:checked');
-    currentPattern = robotPattern[0].value;
-    $("#robotPattern").text("Robot pattern: "+currentPattern);
-    $('patternListUpload').closeModal();
+    currentModel = localStorage.getItem('currentModel');
     document.getElementById('fileID').click();
 });
 
-function selectPattern(listID) {
+function selectModel(listID) {
     var list = document.createElement("form");
     var content = document.getElementById(listID);
     content.innerHTML = "";
@@ -524,16 +523,16 @@ function selectPattern(listID) {
     h.textContent = "Select Robot";
     content.appendChild(h);
     list.setAttribute('action', "#");
-    for (var i = 0; i < patternList.length; i++) {
+    for (var i = 0; i < modelList.length; i++) {
         var p = document.createElement('p');
         var input = document.createElement('input');
         input.setAttribute('name', 'group1');
         input.setAttribute('type', 'radio');
         input.setAttribute('id', 'test' + i);
-        input.setAttribute('value',patternList[i]);
+        input.setAttribute('value',modelList[i]);
         var label = document.createElement('label');
         label.setAttribute('for', 'test' + i);
-        label.textContent = patternList[i];
+        label.textContent = modelList[i];
         p.appendChild(input);
         p.appendChild(label);
         list.appendChild(p);
@@ -559,17 +558,15 @@ var interval = null;
 var intervalIsClosed = false;
 function uploadAndSubmit() {
     event.preventDefault();
-    //if(robotPattern === ) {
-    //    beginURL = "";
-    //}
+
     $('#uploadBtn').addClass('disabled');
-    if(currentPattern === "GS-AS-01") {
-        beginURL = urlMap.GS_AS_01.start_updater_api;
-        uploadURL = urlMap.GS_AS_01.update_api;
-    } else if(currentPattern = "GS_SR_01") {
-        beginURL = urlMap.GS_SR_01.start_updater_api;
-        uploadURL = urlMap.GS_SR_01.update_api;
-    }
+
+    currentModel = localStorage.getItem('currentModel');
+    $("#firmwareProgressBar").css("visibility", "visible");
+    var object = JSON.parse(localStorage.getItem('ipConfig'));
+    beginURL = object[currentModel].start_updater_api;
+    uploadURL = object[currentModel].update_api;
+
     if(beginURL != "") {
         //use ajax to check the internet connectivity
         $.ajax({
@@ -739,13 +736,13 @@ function uploadAndSubmit() {
  * ===========================================================================================
  */
 function back() {
-    eventSum += 1;
+    codeBackEventSum = 1;
     console.log('back');
-    if(currentPattern === "GS-AS-01") {
-        overURL = urlMap.GS_AS_01.stop_updater_api;
-    } else if(currentPattern = "GS_SR_01") {
-        overURL = urlMap.GS_SR_01.stop_updater_api;
-    }
+
+    currentModel = localStorage.getItem('currentModel');
+    $("#firmwareProgressBar").css("visibility", "visible");
+    var object = JSON.parse(localStorage.getItem('ipConfig'));
+    overURL = object[currentModel].stop_updater_api;
     $.ajax({
         url: overURL,
         type: "GET",
@@ -759,7 +756,8 @@ function back() {
             // if($('#backBtn1').length) {
             //     document.getElementById('backBtn1').setAttribute('id','backBtn');
             // }
-            checkReachable();
+            // checkReachable();
+            document.getElementById('mapModule').addEventListener('click',goMapModule);
             document.getElementById('projectModule').addEventListener('click',goProjectModule);
             // document.getElementById('backBtn').removeEventListener('click',false);
             $(this).fadeIn('fast');
@@ -769,7 +767,7 @@ function back() {
 }
 
 //binding so many times will occur horrible error, use eventSum var control the binding
-if(eventSum === 0) {
+if(codeBackEventSum === 0) {
     document.getElementById('backBtn').addEventListener('click', back);
 }
 
