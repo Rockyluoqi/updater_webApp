@@ -25,6 +25,8 @@ function readConfig() {
             $('#modelList').openModal();
         } else {
             localStorage.setItem('currentModel', localStorage.getItem('currentModel'));
+            localStorage.setItem('host',object[localStorage.getItem('currentModel')].host);
+            console.log(object[localStorage.getItem('currentModel')].host);
             $("#modelLabel").text("Robot model: "+localStorage.getItem('currentModel'));
         }
     });
@@ -75,7 +77,7 @@ function selectModel(listID) {
     var content = document.getElementById(listID);
     content.innerHTML = "";
     var h = document.createElement("h4");
-    h.textContent = "Select Robot";
+    h.textContent = "Select robot model";
     content.appendChild(h);
     list.setAttribute('action', "#");
     for (var i = 0; i < modelList.length; i++) {
@@ -137,33 +139,50 @@ function toastError(string) {
 }
 
 document.getElementById('resignIn').addEventListener('click',function() {
-    if(localStorage.getItem('isSignIn')!=null) {
-        localStorage.removeItem("isSignedIn");
-    }
+    localStorage.removeItem('currentModel');
+    localStorage.removeItem("isSignedIn");
     location.href = 'signIn.html';
 });
 
+//the reload button's function on the navigation bar
 document.getElementById('reload').addEventListener('click', function () {
-    // checkReachable();
+    if(localStorage.getItem('page') === 'select') {
+        checkReachable();
+    } else if(localStorage.getItem('page') === 'firmware') {
+        //back button will bind again
+        codeBackEventSum = 0;
+        goFirmwareModule();
+    } else if(localStorage.getItem('page') === 'map') {
+        //back button will bind again
+        mapBackEventSum = 0;
+        goMapModule();
+    }
 });
 
-document.getElementById('projectModule').addEventListener('click',goProjectModule);
-function goProjectModule() {
-    console.log('firmware update');
-
-    //core code to make a one page app, the navigation bar doesn't need to change
-    $('#content1').fadeOut('fast', function() {
-        $(this).load('codeUpdater.html', function() {
-            // $('#nav').remove();
-            $(this).fadeIn('fast');
+document.getElementById('firmwareModule').addEventListener('click',goFirmwareModule);
+function goFirmwareModule() {
+    if(localStorage.getItem('currentModel') === null || localStorage.getItem('currentModel') === "") {
+        selectModel('list-content');
+        $('#modelList').openModal();
+    } else {
+        $('.material-tooltip').remove();
+        localStorage.setItem('page', 'firmware');
+        console.log('firmware update');
+        //core code to make a one page app, the navigation bar doesn't need to change
+        $('#content1').fadeOut('fast', function () {
+            $(this).load('codeUpdater.html', function () {
+                // $('#nav').remove();
+                $(this).fadeIn('fast');
+            });
         });
-    });
+    }
 }
 
 document.getElementById('mapModule').addEventListener('click',goMapModule);
 function goMapModule() {
+    $('.material-tooltip').remove();
     console.log('map migration');
-
+    localStorage.setItem('page', 'map');
     $('#content1').fadeOut('fast', function() {
         $(this).load('mapUpdater.html', function() {
             // $('#nav').remove();
@@ -176,9 +195,5 @@ document.getElementById('backBtn').addEventListener('click',function() {
     // localStorage.removeItem("isSignedIn");
     // location.href = 'signIn.html';
 });
-
-//document.getElementById('projectModule').addEventListener('click',function() {
-//    location.href = "codeUpdater.html";
-//});
 
 readConfig();

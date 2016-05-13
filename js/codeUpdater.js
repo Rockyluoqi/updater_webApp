@@ -116,6 +116,7 @@ function downloadFile(urlData, toast) {
                 // Do something after request finishes
                 Materialize.toast(file_name + toast, 4000);
                 Materialize.toast(file_name + " is saved in firmware_download folder!", 8000);
+                document.getElementById('downloadProgress1').textContent ="100%" + "  Speed: " +"0KB/s";
             } else {
                 //if user cancel the download action, it'll break the request and delete the incomplete file
                 toastError(file_name + " download failed!");
@@ -194,6 +195,7 @@ document.getElementById('download').addEventListener('click', function () {
             });
         }
     });
+    
     downloadSubmit();
     // selectModel('list-content');
 });
@@ -297,7 +299,7 @@ function download() {
                 var a_svg = document.createElement('a');
                 a_svg.setAttribute('class', 'secondary-content');
                 a_svg.setAttribute('id', "close1");
-                a_svg.setAttribute('style', 'margin-left:20px');
+                a_svg.setAttribute('style', 'margin-left:20px;position:absolute;z-index:100;');
                 //a_svg.setAttribute('onclick','cancelAndDelete()');
                 //Svg tag is not surpported
                 //var svg = document.createElement('svg');
@@ -326,7 +328,6 @@ function download() {
 
                 document.getElementById('close1').addEventListener("click", cancelAndDelete);
 
-                console.log(downloadURL + object.data.pkg_file_url);
                 downloadFile(downloadURL + object.data.pkg_file_url, ' is downloaded !');
             } else {
                 $("#firmwareProgressBar").css("visibility", "hidden");
@@ -373,7 +374,7 @@ document.getElementById('rollback').addEventListener('click', function () {
     //     selectModel('list-content-rollback');
     //     $('#modelListRollback').openModal();
     // } else {
-        restore();
+    restore();
     // }
     ////删除目录下的所有文件
     //var files = getAllFiles('./download');
@@ -389,14 +390,15 @@ function restore() {
     currentModel = localStorage.getItem('currentModel');
     $("#firmwareProgressBar").css("visibility", "visible");
     var object = JSON.parse(localStorage.getItem('ipConfig'));
-    beginURL = object[currentModel].start_updater_api;
-    restoreURL = object[currentModel].rollback_api;
+    beginURL = host+object[currentModel].start_updater_api;
+    restoreURL = host+object[currentModel].rollback_api;
 
     if (beginURL != "") {
         $.ajax({
             type: "GET",
             url: beginURL,
             success: function (data) {
+                console.log(beginURL);
                 request.get({url: beginURL}, function (err, httpResponse, body) {
                     setTimeout(function () {
                         $.ajax({
@@ -564,8 +566,8 @@ function uploadAndSubmit() {
     currentModel = localStorage.getItem('currentModel');
     $("#firmwareProgressBar").css("visibility", "visible");
     var object = JSON.parse(localStorage.getItem('ipConfig'));
-    beginURL = object[currentModel].start_updater_api;
-    uploadURL = object[currentModel].update_api;
+    beginURL = host+object[currentModel].start_updater_api;
+    uploadURL = host+object[currentModel].update_api;
 
     if(beginURL != "") {
         //use ajax to check the internet connectivity
@@ -705,6 +707,7 @@ function uploadAndSubmit() {
                                 xhr.onerror = function() {
                                     $("#firmwareProgressBar").css("visibility", "hidden");
                                 };
+                                console.log(uploadURL + file.name);
                                 xhr.open("POST", uploadURL + file.name);
                                 xhr.send(file);
                             } else {
@@ -740,9 +743,11 @@ function back() {
     console.log('back');
 
     currentModel = localStorage.getItem('currentModel');
+    console.log(currentModel);
     $("#firmwareProgressBar").css("visibility", "visible");
     var object = JSON.parse(localStorage.getItem('ipConfig'));
-    overURL = object[currentModel].stop_updater_api;
+    console.log(object);
+    overURL = host+object[currentModel].stop_updater_api;
     $.ajax({
         url: overURL,
         type: "GET",
@@ -753,12 +758,13 @@ function back() {
 
     $('#content1').fadeOut('fast', function() {
         $(this).load('selectModule.html #content1', function() {
+            localStorage.setItem('page', 'select');
             // if($('#backBtn1').length) {
             //     document.getElementById('backBtn1').setAttribute('id','backBtn');
             // }
             // checkReachable();
             document.getElementById('mapModule').addEventListener('click',goMapModule);
-            document.getElementById('projectModule').addEventListener('click',goProjectModule);
+            document.getElementById('firmwareModule').addEventListener('click',goFirmwareModule);
             // document.getElementById('backBtn').removeEventListener('click',false);
             $(this).fadeIn('fast');
         });

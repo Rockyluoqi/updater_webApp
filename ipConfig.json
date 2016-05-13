@@ -1,7 +1,7 @@
 {
   "GS_AS_01": {
     "model":"GS_AS_01",
-    "host":"http://192.168.1.88",
+    "host":"http://192.168.1.107",
     "start_updater_api": ":5678/gs-robot/cmd/launch_system_updater",
     "stop_updater_api": ":5678/gs-robot/cmd/shutdown_system_updater",
     "update_api": ":6789/gs-robot/system/update_system/",

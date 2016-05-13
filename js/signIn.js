@@ -201,8 +201,6 @@ $(document).ready(function() {
                     dateArray.push(currentDate.getSeconds());
 
                     localStorage.setItem('startTime',JSON.stringify(dateArray));
-
-
                     localStorage.setItem("accessKey",data.data.accessKey);
                     location.href = "selectModule.html";
                     localStorage.setItem("isSignedIn","true");
