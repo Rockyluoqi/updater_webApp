@@ -50,7 +50,7 @@ function saveChooseModel() {
 
     var object = JSON.parse(localStorage.getItem('ipConfig'));
     localStorage.setItem('host',object[currentModel].host);
-    // checkReachable();
+    checkReachable();
 }
 /*
  <ul id="dropdown1" class="dropdown-content">

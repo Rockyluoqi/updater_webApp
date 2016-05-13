@@ -324,7 +324,7 @@ function back() {
     $('#content1').fadeOut('fast', function() {
         $(this).load('selectModule.html #content1', function() {
 
-            // checkReachable();
+            checkReachable();
             localStorage.setItem('page', 'select');
             document.getElementById('mapModule').addEventListener('click',goMapModule);
             document.getElementById('projectModule').addEventListener('click',goProjectModule);

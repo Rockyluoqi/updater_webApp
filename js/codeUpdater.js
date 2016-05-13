@@ -762,7 +762,7 @@ function back() {
             // if($('#backBtn1').length) {
             //     document.getElementById('backBtn1').setAttribute('id','backBtn');
             // }
-            // checkReachable();
+            checkReachable();
             document.getElementById('mapModule').addEventListener('click',goMapModule);
             document.getElementById('firmwareModule').addEventListener('click',goFirmwareModule);
             // document.getElementById('backBtn').removeEventListener('click',false);
