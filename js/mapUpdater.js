@@ -309,7 +309,7 @@ function upload(file,i) {
  * ===========================================================================================
  */
 
-function back() {
+function mapBack() {
     mapBackEventSum = 1;
     console.log("back");
 
@@ -323,11 +323,10 @@ function back() {
 
     $('#content1').fadeOut('fast', function() {
         $(this).load('selectModule.html #content1', function() {
-
             checkReachable();
             localStorage.setItem('page', 'select');
-            document.getElementById('mapModule').addEventListener('click',goMapModule);
-            document.getElementById('projectModule').addEventListener('click',goProjectModule);
+            // document.getElementById('mapModule').addEventListener('click',goMapModule);
+            document.getElementById('firmwareModule').addEventListener('click',goFirmwareModule);
             // document.getElementById('backBtn').removeEventListener('click',false);
             $(this).fadeIn('fast');
         });
@@ -337,7 +336,10 @@ function back() {
 }
 
 if(mapBackEventSum === 0) {
-    document.getElementById('backBtn').addEventListener('click', back);
+    if(codeBackEventSum) {
+        document.getElementById('backBtn').removeEventListener('click', firmwareBack);
+    }
+    document.getElementById('backBtn').addEventListener('click', mapBack);
 }
 
 document.getElementById('resignIn').addEventListener('click',function() {

@@ -738,7 +738,7 @@ function uploadAndSubmit() {
  *                                          Go back
  * ===========================================================================================
  */
-function back() {
+function firmwareBack() {
     codeBackEventSum = 1;
     console.log('back');
 
@@ -774,7 +774,10 @@ function back() {
 
 //binding so many times will occur horrible error, use eventSum var control the binding
 if(codeBackEventSum === 0) {
-    document.getElementById('backBtn').addEventListener('click', back);
+    if(mapBackEventSum) {
+        document.getElementById('backBtn').removeEventListener('click', mapBack);
+    }
+    document.getElementById('backBtn').addEventListener('click', firmwareBack);
 }
 
 document.getElementById('resignIn').addEventListener('click',function() {

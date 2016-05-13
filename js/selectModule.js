@@ -5,6 +5,9 @@ var fs = require("fs");
 var modelList = [];
 var codeBackEventSum = 0;
 var mapBackEventSum = 0;
+var mapBack = null;
+var firmwareBack = null;
+var mapIsReachable = false;
 
 
 function readConfig() {
@@ -24,8 +27,9 @@ function readConfig() {
             selectModel('list-content');
             $('#modelList').openModal();
         } else {
+            checkReachable();
             localStorage.setItem('currentModel', localStorage.getItem('currentModel'));
-            localStorage.setItem('host',object[localStorage.getItem('currentModel')].host);
+            // localStorage.setItem('host',object[localStorage.getItem('currentModel')].host);
             console.log(object[localStorage.getItem('currentModel')].host);
             $("#modelLabel").text("Robot model: "+localStorage.getItem('currentModel'));
         }
@@ -104,6 +108,22 @@ function checkReachable() {
 
     const isReachable = require('is-reachable');
 
+    //check map updater module whether reachable
+    isReachable(checkMapUpdaterURL, (err, reachable) => {
+        if(reachable) {
+            $("#mapModule").removeClass("disabled");
+            // document.getElementById('mapModule').href = "mapUpdater.html";
+            document.getElementById('mapModule').addEventListener('click',goMapModule);
+            mapIsReachable = true;
+        } else {
+            $("#mapModule").addClass("disabled");
+            mapIsReachable = false;
+            document.getElementById('mapModule').removeEventListener('click',goMapModule);
+            document.getElementById('mapModule').href = "#";
+            toastError("You can't migrate map now. <br/><br/> Please check the net connection and try again! <br/><br/> (Click the fresh button)", 10000);
+        }
+    });
+
     //check editor module whether reachable
     isReachable(checkEditorURL, (err, reachable) => {
         if(reachable) {
@@ -114,22 +134,6 @@ function checkReachable() {
             document.getElementById('mapEditor').href = "#";
             toastError("You can't edit map now. <br/><br/> Please check the net connection and try again! <br/><br/> (Click the fresh button)", 10000);
         }
-        //console.log(reachable);
-        //=> true
-    });
-
-    //check map updater module whether reachable
-    isReachable(checkMapUpdaterURL, (err, reachable) => {
-        if(reachable) {
-            $("#mapModule").removeClass("disabled");
-            document.getElementById('mapModule').href = "mapUpdater.html";
-        } else {
-            $("#mapModule").addClass("disabled");
-            document.getElementById('mapModule').href = "#";
-            toastError("You can't migrate map now. <br/><br/> Please check the net connection and try again! <br/><br/> (Click the fresh button)", 10000);
-        }
-        //console.log(reachable);
-        //=> true
     });
 }
 
@@ -166,6 +170,7 @@ function goFirmwareModule() {
         $('#modelList').openModal();
     } else {
         $('.material-tooltip').remove();
+        $('.toast').remove();
         localStorage.setItem('page', 'firmware');
         console.log('firmware update');
         //core code to make a one page app, the navigation bar doesn't need to change
@@ -178,9 +183,9 @@ function goFirmwareModule() {
     }
 }
 
-document.getElementById('mapModule').addEventListener('click',goMapModule);
 function goMapModule() {
     $('.material-tooltip').remove();
+    $('.toast').remove();
     console.log('map migration');
     localStorage.setItem('page', 'map');
     $('#content1').fadeOut('fast', function() {
