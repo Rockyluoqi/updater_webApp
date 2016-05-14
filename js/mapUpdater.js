@@ -336,6 +336,7 @@ function mapBack() {
 }
 
 if(mapBackEventSum === 0) {
+    console.log(codeBackEventSum);
     if(codeBackEventSum) {
         document.getElementById('backBtn').removeEventListener('click', firmwareBack);
     }

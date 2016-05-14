@@ -522,7 +522,7 @@ function selectModel(listID) {
     var content = document.getElementById(listID);
     content.innerHTML = "";
     var h = document.createElement("h4");
-    h.textContent = "Select Robot";
+    h.textContent = "Select robot model";
     content.appendChild(h);
     list.setAttribute('action', "#");
     for (var i = 0; i < modelList.length; i++) {
@@ -774,6 +774,7 @@ function firmwareBack() {
 
 //binding so many times will occur horrible error, use eventSum var control the binding
 if(codeBackEventSum === 0) {
+    console.log(mapBackEventSum);
     if(mapBackEventSum) {
         document.getElementById('backBtn').removeEventListener('click', mapBack);
     }

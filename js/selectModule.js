@@ -29,7 +29,8 @@ function readConfig() {
         } else {
             checkReachable();
             localStorage.setItem('currentModel', localStorage.getItem('currentModel'));
-            // localStorage.setItem('host',object[localStorage.getItem('currentModel')].host);
+            var tempModel = localStorage.getItem('currentModel');
+            localStorage.setItem('host',object[tempModel].host);
             console.log(object[localStorage.getItem('currentModel')].host);
             $("#modelLabel").text("Robot model: "+localStorage.getItem('currentModel'));
         }
@@ -56,25 +57,6 @@ function saveChooseModel() {
     localStorage.setItem('host',object[currentModel].host);
     checkReachable();
 }
-/*
- <ul id="dropdown1" class="dropdown-content">
- <li><a href="#!">one</a></li>
- <li class="divider"></li>
- <li><a href="#!">two</a></li>
- <li class="divider"></li>
- <li><a href="#!">three</a></li>
- </ul>
- */
-function createDropdownList() {
-    var list = document.getElementById('dropdown1');
-    list.innerHTML = '';
-    for(var i=0;i<modelList.length;i++) {
-        var li = document.createElement('li');
-        var a = document.createElement('a');
-        a.textContent = modelList[i];
-        a.setAttribute('')
-    }
-}
 
 function selectModel(listID) {
     var list = document.createElement("form");
@@ -94,8 +76,18 @@ function selectModel(listID) {
         var label = document.createElement('label');
         label.setAttribute('for', 'test' + i);
         label.textContent = modelList[i];
+        var img = document.createElement('img');
+        if(label.textContent === 'GS-AS-01') {
+            img.setAttribute('src', './css/icon/robot-topdown-color-horizontal.png');
+            img.setAttribute('style','padding-left:20px;');
+        }
+        if(label.textContent === 'GS-SR-01') {
+            img.setAttribute('src', './css/icon/service-robot-blue.png');
+            img.setAttribute('style','padding-left:20px;');
+        }
         p.appendChild(input);
         p.appendChild(label);
+        p.appendChild(img);
         list.appendChild(p);
     }
     content.appendChild(list);
@@ -113,12 +105,12 @@ function checkReachable() {
         if(reachable) {
             $("#mapModule").removeClass("disabled");
             // document.getElementById('mapModule').href = "mapUpdater.html";
-            document.getElementById('mapModule').addEventListener('click',goMapModule);
             mapIsReachable = true;
         } else {
             $("#mapModule").addClass("disabled");
             mapIsReachable = false;
             document.getElementById('mapModule').removeEventListener('click',goMapModule);
+            document.getElementById('backBtn').removeEventListener('click',mapBack);
             document.getElementById('mapModule').href = "#";
             toastError("You can't migrate map now. <br/><br/> Please check the net connection and try again! <br/><br/> (Click the fresh button)", 10000);
         }
@@ -183,6 +175,7 @@ function goFirmwareModule() {
     }
 }
 
+document.getElementById('mapModule').addEventListener('click',goMapModule);
 function goMapModule() {
     $('.material-tooltip').remove();
     $('.toast').remove();
