@@ -517,31 +517,6 @@ document.getElementById("chooseFileBtn").addEventListener('click',function() {
     document.getElementById('fileID').click();
 });
 
-function selectModel(listID) {
-    var list = document.createElement("form");
-    var content = document.getElementById(listID);
-    content.innerHTML = "";
-    var h = document.createElement("h4");
-    h.textContent = "Select robot model";
-    content.appendChild(h);
-    list.setAttribute('action', "#");
-    for (var i = 0; i < modelList.length; i++) {
-        var p = document.createElement('p');
-        var input = document.createElement('input');
-        input.setAttribute('name', 'group1');
-        input.setAttribute('type', 'radio');
-        input.setAttribute('id', 'test' + i);
-        input.setAttribute('value',modelList[i]);
-        var label = document.createElement('label');
-        label.setAttribute('for', 'test' + i);
-        label.textContent = modelList[i];
-        p.appendChild(input);
-        p.appendChild(label);
-        list.appendChild(p);
-    }
-    content.appendChild(list);
-}
-
 function cancelChooseFile() {
     var content = document.getElementById('list0');
     //when upload this will trigger a error and break the XHR

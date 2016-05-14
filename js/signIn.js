@@ -13,8 +13,10 @@ $(document).ready(function() {
             if(reachable) {
                 //Materialize.toast("You can", 10000);
             } else {
-                console.log();
-                alert("You can't sign in now. Please check the net connection and try again!");
+                if(!localStorage.getItem('isSignedIn') || localStorage.getItem('isSignedIn') === null) {
+                    console.log();
+                    alert("You can't sign in now. Please check the net connection and try again!");
+                }
             }
             //console.log(reachable);
             //=> true

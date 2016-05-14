@@ -32,7 +32,14 @@ function readConfig() {
             var tempModel = localStorage.getItem('currentModel');
             localStorage.setItem('host',object[tempModel].host);
             console.log(object[localStorage.getItem('currentModel')].host);
-            $("#modelLabel").text("Robot model: "+localStorage.getItem('currentModel'));
+            if(tempModel === 'GS-AS-01') {
+                $('#robotImage').attr('src', './css/icon/robot-topdown-color-horizontal.png');
+                $("#modelLabel").text(tempModel);
+            }
+            if(tempModel === 'GS-SR-01') {
+                $('#robotImage').attr('src','./css/icon/service-robot-deepBlue.png');
+                $("#modelLabel").text(tempModel);
+            }
         }
     });
 }
@@ -48,10 +55,17 @@ document.getElementById('chooseModelBtn').addEventListener('click',saveChooseMod
 function saveChooseModel() {
     var robotModel = $('input[name="group1"]:checked');
     var currentModel = robotModel[0].value;
-    $("#modelLabel").text("Robot model: "+currentModel);
+    $("#modelLabel").text(currentModel);
     localStorage.setItem('currentModel', currentModel);
     localStorage.setItem('currentModel', currentModel);
     console.log(localStorage.getItem('currentModel'));
+
+    if(currentModel === 'GS-AS-01') {
+        $('#robotImage').attr('src', './css/icon/robot-topdown-color-horizontal.png');
+    }
+    if(currentModel === 'GS-SR-01') {
+        $('#robotImage').attr('src','./css/icon/service-robot-deepBlue.png');
+    }
 
     var object = JSON.parse(localStorage.getItem('ipConfig'));
     localStorage.setItem('host',object[currentModel].host);
@@ -79,11 +93,11 @@ function selectModel(listID) {
         var img = document.createElement('img');
         if(label.textContent === 'GS-AS-01') {
             img.setAttribute('src', './css/icon/robot-topdown-color-horizontal.png');
-            img.setAttribute('style','padding-left:20px;');
+            img.setAttribute('style','position:absolute;padding-left:20px;padding-top:3px;');
         }
         if(label.textContent === 'GS-SR-01') {
             img.setAttribute('src', './css/icon/service-robot-blue.png');
-            img.setAttribute('style','padding-left:20px;');
+            img.setAttribute('style','position:absolute;padding-left:20px;padding-top:3px;');
         }
         p.appendChild(input);
         p.appendChild(label);
@@ -100,6 +114,7 @@ function checkReachable() {
 
     const isReachable = require('is-reachable');
 
+    $('.toast').remove();
     //check map updater module whether reachable
     isReachable(checkMapUpdaterURL, (err, reachable) => {
         if(reachable) {
