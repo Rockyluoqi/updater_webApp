@@ -326,9 +326,13 @@ top:2px;
 
 #chooseFileBtn {
     margin-top: 30px;
-    margin-left:30px;
+    margin-left:10px;
 }
 
+#chooseAudioFileBtn {
+    margin-top: 30px;
+    margin-left:10px;
+}
 /*#backBtn {*/
 /*margin-top: 30px;*/
 /*width: 60px;*/

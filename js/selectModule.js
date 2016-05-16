@@ -3,26 +3,33 @@
  */
 var fs = require("fs");
 var modelList = [];
+
+//control the event register
 var codeBackEventSum = 0;
 var mapBackEventSum = 0;
+
+//control the go back button event register
 var mapBack = null;
 var firmwareBack = null;
 var mapIsReachable = false;
 
-
+//read config json file named ipConfig.json using Node filesystem module
 function readConfig() {
     fs.readFile("./ipConfig.json","utf-8",function(error, fileData){
         console.log("error "+error);
-
+        //save in localStorage for sharing the json data among javascript files.
         localStorage.setItem('ipConfig',fileData);
 
         var object = JSON.parse(fileData);
         console.log(object);
+
+        //make a new modelList
         for(var one in object) {
             modelList.push(one);
         }
         console.log(localStorage.getItem('currentModel'));
 
+        //if you open the app again, you don't need to select again.It has a default value in the localStorage
         if(localStorage.getItem('currentModel') === null || localStorage.getItem('currentModel') === "") {
             selectModel('list-content');
             $('#modelList').openModal();
@@ -32,6 +39,7 @@ function readConfig() {
             var tempModel = localStorage.getItem('currentModel');
             localStorage.setItem('host',object[tempModel].host);
             console.log(object[localStorage.getItem('currentModel')].host);
+            //set robot icon image
             if(tempModel === 'GS-AS-01') {
                 $('#robotImage').attr('src', './css/icon/robot-topdown-color-horizontal.png');
                 $("#modelLabel").text(tempModel);
@@ -44,14 +52,13 @@ function readConfig() {
     });
 }
 
-document.getElementById('reselectModel').addEventListener('click',function() {
+//select the model again
+document.getElementById('modelLabel').addEventListener('click',function() {
     selectModel('list-content');
     $('#modelList').openModal();
 });
 
-
 document.getElementById('chooseModelBtn').addEventListener('click',saveChooseModel);
-
 function saveChooseModel() {
     var robotModel = $('input[name="group1"]:checked');
     var currentModel = robotModel[0].value;
@@ -72,6 +79,7 @@ function saveChooseModel() {
     checkReachable();
 }
 
+//create a model list in the modal
 function selectModel(listID) {
     var list = document.createElement("form");
     var content = document.getElementById(listID);
@@ -114,6 +122,7 @@ function checkReachable() {
 
     const isReachable = require('is-reachable');
 
+    //remove all toasts which are not finished.
     $('.toast').remove();
     //check map updater module whether reachable
     isReachable(checkMapUpdaterURL, (err, reachable) => {

@@ -1,5 +1,5 @@
 /**
- * download
+ * download maps and upload maps
  */
 var request = require('request'),
     fs = require('fs'),
@@ -15,7 +15,11 @@ var getMapListURL = host+":8080/gs-robot/data/maps";
 var beginURL = host+":8080/gs-robot/cmd/launch_map_loader";
 var overURL = host+":8080/gs-robot/cmd/shutdown_map_loader";
 var hostname = host;
+var modelList = [];
+
 $('.modal-trigger').leanModal();
+
+//send the start request at the first time
 $.ajax({
     url:beginURL,
     type:"GET",
@@ -24,18 +28,15 @@ $.ajax({
         if(data.errorCode === "") {
             Materialize.toast("Start successfully!", 4000);
         } else {
-            //toastError("Start failed!");
-            //Materialize.toast("<span style='color: #ff0000;font-size: 30px'>"+"Start failed!"+"</span></div>", 4000);
+            toastError("Start server failed!");
         }
     },
     error: function(XMLHttpRequest, textStatus, errorThrown) {
         $("#mapProgressBar").css("visibility", "hidden");
         console.log("mapupdater start error: "+textStatus);
-        if(textStatus == 'error') {
+        if(textStatus === 'error') {
             toastError("Start module failed!");
             toastError("Please connect to the Robot WI-FI first and refresh!");
-            //Materialize.toast("<span style='color: #ff0000;font-size: 30px'>"+"Start module failed!"+"</span></div>",20000);
-            //Materialize.toast("<span style='color: #ff0000;font-size: 30px'>"+"Please connect to the Robot WI-FI first and refresh!"+"</span></div>",20000);
         }
     }
 });
@@ -49,22 +50,12 @@ function toastError(string) {
  *                                    download project
  * ===========================================================================================
  */
+//download multiple map packages
 function downloadFile(urlData,fileName,toast){
-    //var aLink = document.createElement('a');
-    //var evt = document.createEvent("HTMLEvents");
-    //evt.initEvent("click");
-    //aLink.download = fileName;
-    //aLink.href = urlData;
-    //aLink.dispatchEvent(evt);
-
     $("#mapProgressBar").css("visibility", "visible");
 
-    //var file_name = url.parse(urlData).pathname.split('/').pop();
-    //console.log('filename: ' + file_name);
     var out = fs.createWriteStream('./map_download/' + fileName+".tar.gz");
-
     console.log(urlData);
-
     //use nodejs http module
     var options = {
         hostname:hostname,
@@ -92,27 +83,6 @@ function downloadFile(urlData,fileName,toast){
     });
 }
 
-//var $upload = $('#upload');
-//$upload.('change',onFileInputChange,false);
-/**
- * test
- * @type {Array}
- */
-//var modelList = [];
-//function getModelList() {
-//    $.ajax({
-//        url:,
-//        type:"get",
-//        dataType:"json",
-//        async:false,
-//        success: function(data) {
-//            modelList = data;
-//        }
-//    });
-//}
-/**
- * use
- */
 function getImageList() {
     $.ajax({
         url: getMapListURL,
@@ -136,7 +106,7 @@ function parseMapList() {
     }
     return mapDataArray;
 }
-var modelList = [];
+
 document.getElementById('download').addEventListener('click', function () {
     getImageList();
     modelList = [];
@@ -154,6 +124,7 @@ document.getElementById('download').addEventListener('click', function () {
         }
     });
 
+    //create a download list
     var list = document.createElement("form");
     var content = document.getElementById('list-content');
     content.innerHTML = "";
@@ -185,11 +156,8 @@ document.getElementById('downloadSubmit').addEventListener('click',function() {
     console.log(selectedMap.length);
     for(var i=0;i<selectedMap.length;i++) {
         console.log(selectedMap[i].value);
-        //downloadFile("" + value,' is downloaded !');
         downloadFile(downloadURL+"?mapName="+selectedMap[i].value, selectedMap[i].value, ' is downloaded !');
     }
-    //downloadFile("url"+robotModel+".zip",' is downloaded !');
-    //downloadFile("http://127.0.0.1:8888/robot1package",' is downloaded !');
 });
 
 /**
@@ -197,7 +165,7 @@ document.getElementById('downloadSubmit').addEventListener('click',function() {
  *                                         Upload
  * ===========================================================================================
  */
-//show selected files in a list
+//show selected files in a list and the progress text
 $('input[type=file]').change(function() {
     var form = document.forms["uploadForm"];
     if (form["file"].files.length > 0) {
@@ -308,7 +276,7 @@ function upload(file,i) {
  *                                          Go back
  * ===========================================================================================
  */
-
+//comment you can check the codeUpdater
 function mapBack() {
     mapBackEventSum = 1;
     console.log("back");
@@ -331,8 +299,6 @@ function mapBack() {
             $(this).fadeIn('fast');
         });
     });
-
-    // location.href = "selectModule.html";
 }
 
 if(mapBackEventSum === 0) {

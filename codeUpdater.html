@@ -118,10 +118,13 @@
                 <!--<button class="button dh" id="upload">Upload</button>-->
                 <a class="waves-effect waves-light btn-large blue tooltipped" id="chooseFileBtn" data-position="bottom"
                    data-delay="50" data-tooltip="选择已下载固件">choose firmware</a>
+                <a class="waves-effect waves-light btn-large blue tooltipped" id="chooseAudioFileBtn" data-position="bottom"
+                   data-delay="50" data-tooltip="选择音频文件">choose audio</a>
                 <a class="waves-effect waves-light btn-large tooltipped" id="uploadBtn" data-position="bottom"
                    data-delay="50" data-tooltip="将固件推送至机器人" href="#"
                    onclick="document.getElementById('upload').click();return false;">push & update</a>
                 <input id="fileID" type="file" accept=".gspkg" name="file" style="visibility: hidden"/>
+                <input id="audioFileID" type="file" accept="application/zip" name="file" style="visibility: hidden"/>
                 <!--multiple="multiple"/>-->
                 <input id="upload" type="submit" value="Submit" style="visibility: hidden"/>
             </form>
@@ -218,6 +221,5 @@
     <div>GAUSSIAN ROBOT</div>
 </footer>
 <script type="text/javascript" src="js/codeUpdater.js"></script>
-<!--<script type="text/javascript" src="js/download.js"></script>-->
 </body>
 </html>
