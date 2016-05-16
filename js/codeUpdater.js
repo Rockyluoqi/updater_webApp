@@ -11,7 +11,6 @@ var request = require('request'),
     dns = require('dns'),
     isReachable = require('is-reachable');
 
-
 //get the host (http:// + IP)
 var host = localStorage.getItem('host');
 //save the robot model
@@ -108,11 +107,13 @@ function downloadFile(urlData, toast) {
 
 function showUpdateBtn() {
     $("#chooseFileBtn").css('visibility', 'visible');
+    $("#chooseAudioFileBtn").css('visibility', 'visible');
     $("#uploadBtn").css('visibility', 'visible');
 }
 
 function hideUpdateBtn() {
     $("#chooseFileBtn").css('visibility', 'hidden');
+    $("#chooseAudioFileBtn").css('visibility', 'hidden');
     $("#uploadBtn").css('visibility', 'hidden');
 }
 
@@ -380,15 +381,22 @@ function getAllFiles(root) {
  *                                         Upload
  * ===========================================================================================
  */
+var filesForm;
 //show selected files in a list
 $('input[type=file]').change(function () {
     currentModel = localStorage.getItem('currentModel');
     //get the uploadForm
     var form = document.forms["uploadForm"];
-    if (form["file"].files.length > 0) {
+    if(currentFilePattern === 'firmware') {
+        filesForm = form['file'];
+    }
+    if(currentFilePattern === 'audio') {
+        filesForm = form['audioFile'];
+    }
+    if (filesForm.files.length > 0) {
         $("#uploadBtn").css("background-color", "#2196F3");
         $("#uploadBtn").css("color", "#FFFFFF");
-        var files = form["file"].files;
+        var files = filesForm.files;
         var ul = document.getElementById('listContainer');
 
         clearList();
@@ -433,7 +441,7 @@ document.getElementById("chooseFileBtn").addEventListener('click', function () {
 
 document.getElementById("chooseAudioFileBtn").addEventListener('click', function () {
     currentModel = localStorage.getItem('currentModel');
-    currentModel = 'audio';
+    currentFilePattern = 'audio';
     document.getElementById('audioFileID').click();
 });
 
@@ -488,14 +496,20 @@ function uploadAndSubmit() {
                     interval = setInterval(function () {
                         if (object.successed) {
                             var form = document.forms["uploadForm"];
-                            var fileName = $("[name='file']#fileID").val().split('\\').pop();
-                            //var fileName= $("[name='file']#fileID").val();
-                            console.log(fileName);
+                            var fileName;
+                            if(currentFilePattern === 'firmware') {
+                                fileName = $("[name='file']#fileID").val().split('\\').pop();
+                            }
+                            if(currentFilePattern === 'audio') {
+                                fileName = $("[name='audioFile']#audioFileID").val().split('\\').pop();
+                            }
+
+                            console.log("fileName: "+fileName);
                             $("#firmwareProgressBar").css("visibility", "visible");
-                            if (form["file"].files.length > 0) {
+                            if (filesForm.files.length > 0) {
 
                                 // 寻找表单域中的 <input type="file" ... /> 标签
-                                var file = form["file"].files[0];
+                                var file = filesForm.files[0];
 
                                 //var formData = new FormData();
                                 //
@@ -509,6 +523,7 @@ function uploadAndSubmit() {
                                     var done = e.position || e.loaded;
                                     var total = e.totalSize || e.total;
                                     if (total != 0 && !intervalIsClosed) {
+                                        console.log("clearInterval-------------------");
                                         clearInterval(interval);
                                         intervalIsClosed = true;
                                     }
@@ -528,7 +543,7 @@ function uploadAndSubmit() {
 
                                     $('#uploadBtn').removeClass('disabled');
 
-                                    //clearInterval(interval);
+                                    clearInterval(interval);
                                     if (object.successed) {
                                         document.getElementById('progress1').textContent = "Update complete";
                                         Materialize.toast("Update successfully", 4000);
@@ -579,6 +594,8 @@ function uploadAndSubmit() {
  * ===========================================================================================
  */
 function firmwareBack() {
+    clearInterval(interval);
+    intervalIsClosed = true;
     //control the event binding
     codeBackEventSum = 1;
     console.log('back');

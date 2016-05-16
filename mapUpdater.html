@@ -13,7 +13,7 @@
     <script>window.Hammer = require('./js/lib/hammerjs');</script>
     <script type="text/javascript" src="js/lib/materialize.min.js"></script>
 
-    <title>Gaussian System Toolbox v0.1.0</title>
+    <title>Gaussian System Toolbox v0.2.6</title>
 </head>
 <body style="padding: 0;">
 <!--<nav>-->
@@ -103,8 +103,8 @@
                     </div>
                 </div>
             </div>
-            <form name="uploadForm" id="uploadForm" method="post" enctype="multipart/form-data"
-                  action="javascript: uploadAndSubmit();">
+            <form name="mapUploadForm" id="mapUploadForm" method="post" enctype="multipart/form-data"
+                  action="javascript: mapUploadAndSubmit();">
                 <!--<a class="btn-floating btn-large waves-effect waves-light green tooltipped" id="backBtn" onclick="back()" data-position="bottom"-->
                    <!--data-delay="50" data-tooltip="返回">-->
                     <!--<svg fill="#FFFFFF" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">-->
@@ -119,18 +119,18 @@
                         <!--<path d="M0 0h24v24H0z" fill="none"/>-->
                     <!--</svg>-->
                 <!--</a>-->
-                <a class="waves-effect waves-light btn-large green modal-trigger tooltipped" id="download"
+                <a class="waves-effect waves-light btn-large green modal-trigger tooltipped" id="mapDownload"
                    href="#modelList" data-position="bottom" data-delay="50" data-tooltip="下载地图包">Download Maps</a>
                 <!--<button class="button dh" id="upload">Upload</button>-->
-                <a class="waves-effect waves-light btn-large blue tooltipped" id="chooseFileBtn" data-position="bottom"
+                <a class="waves-effect waves-light btn-large blue tooltipped" id="mapChooseFileBtn" data-position="bottom"
                    data-delay="50" data-tooltip="选择文件" href="#"
-                   onclick="document.getElementById('fileID').click();return false;">choose maps</a>
-                <a class="waves-effect waves-light btn-large tooltipped" id="uploadBtn" data-position="bottom"
+                   onclick="document.getElementById('mapFileID').click();return false;">choose maps</a>
+                <a class="waves-effect waves-light btn-large tooltipped" id="mapUploadBtn" data-position="bottom"
                    data-delay="50" data-tooltip="上传选中文件" href="#"
-                   onclick="document.getElementById('upload').click();return false;">push & update</a>
-                <input id="fileID" type="file" accept="application/tar.gz" name="file" style="visibility: hidden" id="uploadFile"
+                   onclick="document.getElementById('mapUpload').click();return false;">push & update</a>
+                <input id="mapFileID" type="file" accept="application/tar.gz" name="file" style="visibility: hidden"
                        multiple="multiple"/>
-                <input id="upload" type="submit" value="Submit" style="visibility: hidden"/>
+                <input id="mapUpload" type="submit" value="Submit" style="visibility: hidden"/>
             </form>
             <div style="position:relative">
                 <p class="tips">Please connect to the robot WI-FI first.</p>
@@ -162,8 +162,8 @@
             <!--</form>-->
         </div>
 
-        <div id="modelList" class="modal modal-fixed-footer">
-            <div class="modal-content" id="list-content">
+        <div id="mapList" class="modal modal-fixed-footer">
+            <div class="modal-content" id="map-list-content">
                 <!--<form action="#">-->
                 <!--<p>-->
                 <!--<input name="group1" type="radio" id="test1"/>-->
@@ -181,7 +181,7 @@
             </div>
             <div class="modal-footer">
                 <a href="#!" class=" modal-action modal-close waves-effect waves-green btn-flat">cancel</a>
-                <a href="#!" id="downloadSubmit" class=" modal-action modal-close waves-effect waves-green btn-flat"
+                <a href="#!" id="mapDownloadSubmit" class=" modal-action modal-close waves-effect waves-green btn-flat"
                    onclick="Materialize.toast('Downloading', 4000)">YES Download</a>
             </div>
         </div>

@@ -201,16 +201,21 @@ function goFirmwareModule() {
 
 document.getElementById('mapModule').addEventListener('click',goMapModule);
 function goMapModule() {
-    $('.material-tooltip').remove();
-    $('.toast').remove();
-    console.log('map migration');
-    localStorage.setItem('page', 'map');
-    $('#content1').fadeOut('fast', function() {
-        $(this).load('mapUpdater.html', function() {
-            // $('#nav').remove();
-            $(this).fadeIn('fast');
+    if(localStorage.getItem('currentModel') === null || localStorage.getItem('currentModel') === "") {
+        selectModel('list-content');
+        $('#modelList').openModal();
+    } else {
+        $('.material-tooltip').remove();
+        $('.toast').remove();
+        console.log('map migration');
+        localStorage.setItem('page', 'map');
+        $('#content1').fadeOut('fast', function () {
+            $(this).load('mapUpdater.html', function () {
+                // $('#nav').remove();
+                $(this).fadeIn('fast');
+            });
         });
-    });
+    }
 }
 
 document.getElementById('backBtn').addEventListener('click',function() {

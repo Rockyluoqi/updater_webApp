@@ -9,23 +9,24 @@ var request = require('request'),
     mkdirp = require('mkdirp');
 
 var host = localStorage.getItem('host');
-var downloadURL= host + ":8088/gs-robot/data/download_map";
-var uploadURL = host+":8088/gs-robot/data/upload_map";
+var mapDownloadURL= host + ":8088/gs-robot/data/download_map";
+var mapUploadURL = host+":8088/gs-robot/data/upload_map";
 var getMapListURL = host+":8080/gs-robot/data/maps";
-var beginURL = host+":8080/gs-robot/cmd/launch_map_loader";
-var overURL = host+":8080/gs-robot/cmd/shutdown_map_loader";
-var hostname = host;
-var modelList = [];
+var mapBeginURL = host+":8080/gs-robot/cmd/launch_map_loader";
+var mapOverURL = host+":8080/gs-robot/cmd/shutdown_map_loader";
+var hostname = host.split('/')[2];
+var mapList = [];
 
-$('.modal-trigger').leanModal();
+// $('.modal-trigger').leanModal();
 
 //send the start request at the first time
 $.ajax({
-    url:beginURL,
+    url:mapBeginURL,
     type:"GET",
     success:function(data) {
         console.log("start response: "+data);
-        if(data.errorCode === "") {
+        var object = JSON.parse(data);
+        if(object.errorCode === "") {
             Materialize.toast("Start successfully!", 4000);
         } else {
             toastError("Start server failed!");
@@ -55,7 +56,7 @@ function downloadFile(urlData,fileName,toast){
     $("#mapProgressBar").css("visibility", "visible");
 
     var out = fs.createWriteStream('./map_download/' + fileName+".tar.gz");
-    console.log(urlData);
+
     //use nodejs http module
     var options = {
         hostname:hostname,
@@ -107,12 +108,13 @@ function parseMapList() {
     return mapDataArray;
 }
 
-document.getElementById('download').addEventListener('click', function () {
+document.getElementById('mapDownload').addEventListener('click', function () {
     getImageList();
-    modelList = [];
-    modelList = parseMapList();
-    //getModelList();
-    console.log(modelList);
+    mapList = [];
+    mapList = parseMapList();
+    //getmapList();
+    console.log(mapList);
+    $('#mapList').openModal();
 
     fs.stat('./map_download',function(err,stat) {
         if(err === null) {
@@ -126,23 +128,23 @@ document.getElementById('download').addEventListener('click', function () {
 
     //create a download list
     var list = document.createElement("form");
-    var content = document.getElementById('list-content');
+    var content = document.getElementById('map-list-content');
     content.innerHTML = "";
     var h = document.createElement("h4");
     h.innerText = "Select map";
     content.appendChild(h);
     list.setAttribute('action', "#");
-    for(var i=0;i<modelList.length;i++) {
+    for(var i=0;i<mapList.length;i++) {
         var p = document.createElement('p');
         var input = document.createElement('input');
-        input.setAttribute('name', 'group1');
+        input.setAttribute('name', 'group2');
         //support multiple selection
         input.setAttribute('type', 'checkbox');
         input.setAttribute('id', 'test' + i);
-        input.setAttribute('value',modelList[i]);
+        input.setAttribute('value',mapList[i]);
         var label = document.createElement('label');
         label.setAttribute('for', 'test' + i);
-        label.innerText = modelList[i];
+        label.innerText = mapList[i];
         p.appendChild(input);
         p.appendChild(label);
         list.appendChild(p);
@@ -150,13 +152,13 @@ document.getElementById('download').addEventListener('click', function () {
     content.appendChild(list);
 });
 
-document.getElementById('downloadSubmit').addEventListener('click',function() {
+document.getElementById('mapDownloadSubmit').addEventListener('click',function() {
     $("#mapProgressBar").css("visibility", "visible");
-    var selectedMap = $('input[name="group1"]:checked');
+    var selectedMap = $('input[name="group2"]:checked');
     console.log(selectedMap.length);
     for(var i=0;i<selectedMap.length;i++) {
         console.log(selectedMap[i].value);
-        downloadFile(downloadURL+"?mapName="+selectedMap[i].value, selectedMap[i].value, ' is downloaded !');
+        downloadFile(mapDownloadURL+"?map_name="+selectedMap[i].value, selectedMap[i].value, ' is downloaded !');
     }
 });
 
@@ -167,10 +169,10 @@ document.getElementById('downloadSubmit').addEventListener('click',function() {
  */
 //show selected files in a list and the progress text
 $('input[type=file]').change(function() {
-    var form = document.forms["uploadForm"];
+    var form = document.forms["mapUploadForm"];
     if (form["file"].files.length > 0) {
-        $("#uploadBtn").css("background-color", "#2196F3");
-        $("#uploadBtn").css("color", "#FFFFFF");
+        $("#mapUploadBtn").css("background-color", "#2196F3");
+        $("#mapUploadBtn").css("color", "#FFFFFF");
         var files = form["file"].files;
         var ul = document.getElementById('listContainer');
 
@@ -202,8 +204,8 @@ $('input[type=file]').change(function() {
         }
     } else {
         alert("Please choose a file.");
-        $("#uploadBtn").css("background-color", "#DFDFDF");
-        $("#uploadBtn").css("color", "#9F9F9F");
+        $("#mapUploadBtn").css("background-color", "#DFDFDF");
+        $("#mapUploadBtn").css("color", "#9F9F9F");
     }
 });
 
@@ -212,9 +214,9 @@ function clearList() {
     list.innerHTML = "";
 }
 
-function uploadAndSubmit() {
+function mapUploadAndSubmit() {
     event.preventDefault();
-    var form = document.forms["uploadForm"];
+    var form = document.forms["mapUploadForm"];
     //var fileName = $("[name='file']#fileID").val().split('\\').pop();
     ////var fileName= $("[name='file']#fileID").val();
     //console.log(fileName);
@@ -223,6 +225,7 @@ function uploadAndSubmit() {
 
         // 寻找表单域中的 <input type="file" ... /> 标签
         var files = form["file"].files;
+        console.log(files);
 
         for(var i=0;i<files.length;i++) {
             /**
@@ -233,8 +236,8 @@ function uploadAndSubmit() {
         }
     } else {
         alert("Please choose a file.");
-        $("#uploadBtn").css("background-color", "#DFDFDF");
-        $("#uploadBtn").css("color", "#9F9F9F");
+        $("#mapUploadBtn").css("background-color", "#DFDFDF");
+        $("#mapUploadBtn").css("color", "#9F9F9F");
     }
 }
 
@@ -257,6 +260,7 @@ function upload(file,i) {
             $("#mapProgressBar").css("visibility", "hidden");
         } else {
             toastError("Upload failed!");
+            toastError(object.errorCode);
             //Materialize.toast("Upload failed!", 4000);
             $("#mapProgressBar").css("visibility", "hidden");
         }
@@ -268,7 +272,8 @@ function upload(file,i) {
 
     var fileName = file.name.split(".")[0];
     console.log("fileName:"+file.name+" "+fileName);
-    xhr.open("POST", uploadURL+"?map_name="+fileName);
+    console.log(mapUploadURL+"?map_name="+fileName);
+    xhr.open("POST", mapUploadURL+"?map_name="+fileName);
     xhr.send(file);
 }
 /**
@@ -282,7 +287,7 @@ function mapBack() {
     console.log("back");
 
     $.ajax({
-        url:overURL,
+        url:mapOverURL,
         type:"GET",
         success:function(data) {
             console.log("shut down response: "+data);
@@ -293,7 +298,7 @@ function mapBack() {
         $(this).load('selectModule.html #content1', function() {
             checkReachable();
             localStorage.setItem('page', 'select');
-            // document.getElementById('mapModule').addEventListener('click',goMapModule);
+            document.getElementById('mapModule').addEventListener('click',goMapModule);
             document.getElementById('firmwareModule').addEventListener('click',goFirmwareModule);
             // document.getElementById('backBtn').removeEventListener('click',false);
             $(this).fadeIn('fast');
