@@ -2,6 +2,7 @@
 
 > web_updater uses js, html5, materialize framework to make a awesome one page web_app.
 > Welcome you to help me to make it better.
+> In the next version, I'll try to use the React framework.
 
 ### Version information
 
