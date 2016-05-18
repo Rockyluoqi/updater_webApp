@@ -284,7 +284,7 @@ function upload(file, i) {
 //comment you can check the codeUpdater
 function mapBack() {
     mapBackEventSum = 1;
-    console.log("back");
+    console.log('back from map migration');
 
     $.ajax({
         url: mapOverURL,
@@ -298,6 +298,7 @@ function mapBack() {
         $(this).load('selectModule.html #content1', function () {
             checkReachable();
             localStorage.setItem('page', 'select');
+            $('#titleText').text("FUNCTION SELECTION");
             document.getElementById('mapModule').addEventListener('click', goMapModule);
             document.getElementById('firmwareModule').addEventListener('click', goFirmwareModule);
             // document.getElementById('backBtn').removeEventListener('click',false);

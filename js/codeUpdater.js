@@ -642,7 +642,7 @@ function firmwareBack() {
     intervalIsClosed = true;
     //control the event binding
     codeBackEventSum = 1;
-    console.log('back');
+    console.log('back from firmware');
 
     currentModel = localStorage.getItem('currentModel');
     console.log(currentModel);
@@ -665,6 +665,7 @@ function firmwareBack() {
             // if($('#backBtn1').length) {
             //     document.getElementById('backBtn1').setAttribute('id','backBtn');
             // }
+            $('#titleText').text("FUNCTION SELECTION");
             checkReachable();
             document.getElementById('mapModule').addEventListener('click', goMapModule);
             document.getElementById('firmwareModule').addEventListener('click', goFirmwareModule);

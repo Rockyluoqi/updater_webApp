@@ -192,6 +192,7 @@ function goFirmwareModule() {
         selectModel('list-content');
         $('#modelList').openModal();
     } else {
+        $('#titleText').text("FIRMWARE UPDATE");
         $('.material-tooltip').remove();
         $('.toast').remove();
         localStorage.setItem('page', 'firmware');
@@ -212,6 +213,7 @@ function goMapModule() {
         selectModel('list-content');
         $('#modelList').openModal();
     } else {
+        $('#titleText').text("MAP MIGRATION");
         $('.material-tooltip').remove();
         $('.toast').remove();
         console.log('map migration');
