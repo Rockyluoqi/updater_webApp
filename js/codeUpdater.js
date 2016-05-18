@@ -22,6 +22,9 @@ var currentFilePattern = '';
 var interval = null;
 var intervalIsClosed = false;
 
+var percentNum = 0;
+var percentText;
+
 //default URLs
 //following two URLs on internet
 var downloadURL = "http://download.gs-robot.com/system_package/";
@@ -72,7 +75,10 @@ function downloadFile(urlData, toast) {
             //     }
             // }
             //console.log('progress', state);
-            document.getElementById('downloadProgress1').textContent = toDecimal2(state.percentage * 100) + "%" + "  Speed: " + parseInt(state.speed / 1024) + " KB/s";
+            percentNum = toDecimal2(state.percentage * 100);
+            percentText = toDecimal2(state.percentage * 100) + "%" + "  Speed: " + parseInt(state.speed / 1024) + " KB/s";
+            document.getElementById('downloadProgress1').textContent = percentText;
+            document.getElementById('progressDeter').setAttribute('style', "width:" + percentNum + "%");
         })
         // when error occurs program will go here
         .on('error', function (err) {
@@ -91,6 +97,7 @@ function downloadFile(urlData, toast) {
                 Materialize.toast(file_name + toast, 4000);
                 Materialize.toast(file_name + " is saved in firmware_download folder!", 8000);
                 document.getElementById('downloadProgress1').textContent = "100%" + "  Speed: " + "0KB/s";
+                document.getElementById('progressDeter').setAttribute('style', "width:0%");
             } else {
                 //if user cancel the download action, it'll break the request and delete the incomplete file
                 toastError(file_name + " download failed!");
@@ -109,12 +116,14 @@ function showUpdateBtn() {
     $("#chooseFileBtn").css('visibility', 'visible');
     $("#chooseAudioFileBtn").css('visibility', 'visible');
     $("#uploadBtn").css('visibility', 'visible');
+    $("#uploadAudioBtn").css('visibility', 'visible');
 }
 
 function hideUpdateBtn() {
     $("#chooseFileBtn").css('visibility', 'hidden');
     $("#chooseAudioFileBtn").css('visibility', 'hidden');
     $("#uploadBtn").css('visibility', 'hidden');
+    $("#uploadAudioBtn").css('visibility', 'hidden');
 }
 
 //to decimal, save 2 digits
@@ -177,8 +186,8 @@ document.getElementById('download').addEventListener('click', function () {
 
 function downloadSubmit() {
     hideUpdateBtn();
-    isReachable(downloadURL,(err,reachable) => {
-        if(reachable) {
+    isReachable(downloadURL, (err, reachable) => {
+        if (reachable) {
             download();
         } else {
             toastError("Please connect to the Internet first!");
@@ -269,10 +278,24 @@ function download() {
                 var img = document.createElement('img');
                 img.src = "css/icon/ic_cancel_black_24dp_1x.png";
 
+                /*
+                 <div class="progress">
+                 <div class="determinate" style="width: 70%"></div>
+                 </div>
+                 */
+                var progressDiv = document.createElement('div');
+                progressDiv.setAttribute('class', 'progress');
+                var subProgressDiv = document.createElement('div');
+                subProgressDiv.setAttribute('class', 'determinate');
+                subProgressDiv.setAttribute('id', 'progressDeter');
+                subProgressDiv.setAttribute('style', 'width: 0%');
+                progressDiv.appendChild(subProgressDiv);
+
                 a_svg.appendChild(img);
                 div.appendChild(a_svg);
                 div.appendChild(a);
                 li.appendChild(div);
+                li.appendChild(progressDiv);
                 ul.appendChild(li);
 
                 document.getElementById('close1').addEventListener("click", cancelAndDelete);
@@ -387,15 +410,17 @@ $('input[type=file]').change(function () {
     currentModel = localStorage.getItem('currentModel');
     //get the uploadForm
     var form = document.forms["uploadForm"];
-    if(currentFilePattern === 'firmware') {
+    if (currentFilePattern === 'firmware') {
         filesForm = form['file'];
     }
-    if(currentFilePattern === 'audio') {
+    if (currentFilePattern === 'audio') {
         filesForm = form['audioFile'];
     }
     if (filesForm.files.length > 0) {
         $("#uploadBtn").css("background-color", "#2196F3");
+        $("#uploadAudioBtn").css("background-color", "#2196F3");
         $("#uploadBtn").css("color", "#FFFFFF");
+        $("#uploadAudioBtn").css("color", "#FFFFFF");
         var files = filesForm.files;
         var ul = document.getElementById('listContainer');
 
@@ -460,10 +485,12 @@ function clearList() {
     list.innerHTML = "";
 }
 
+var canUpload = true;
 function uploadAndSubmit() {
+    var intervalTime;
     event.preventDefault();
-
     $('#uploadBtn').addClass('disabled');
+    $('#uploadAudioBtn').addClass('disabled');
 
     currentModel = localStorage.getItem('currentModel');
     $("#firmwareProgressBar").css("visibility", "visible");
@@ -476,112 +503,129 @@ function uploadAndSubmit() {
         uploadURL = host + object[currentModel].update_audio_api;
     }
 
+    console.log(canUpload);
     if (beginURL != "") {
         //use ajax to check the internet connectivity
-        $.ajax({
-            type: "GET",
-            url: beginURL,
-            success: function (data) {
-                console.log("start response " + data);
-                //use request
-                request.get({url: beginURL}, function (err, httpResponse, body) {
-                    console.log("start response: " + httpResponse);
-                    console.log("start error: " + err);
-                    $("#firmwareProgressBar").css("visibility", "visible");
-                    var object = JSON.parse(body);
-                    console.log(object);
-                    //setTimeout(function() {
-
-                    //ask for upload file every 3 seconds a time
-                    interval = setInterval(function () {
-                        if (object.successed) {
-                            var form = document.forms["uploadForm"];
-                            var fileName;
-                            if(currentFilePattern === 'firmware') {
-                                fileName = $("[name='file']#fileID").val().split('\\').pop();
+        if (canUpload) {
+            $.ajax({
+                type: "GET",
+                url: beginURL,
+                success: function (data) {
+                    canUpload = false;
+                    console.log("start response " + data);
+                    //use request
+                    request.get({url: beginURL}, function (err, httpResponse, body) {
+                        console.log("start response: " + httpResponse);
+                        console.log("start error: " + err);
+                        $("#firmwareProgressBar").css("visibility", "visible");
+                        var object = JSON.parse(body);
+                        console.log(object);
+                        intervalTime = 0;
+                        //setTimeout(function() {
+                        //ask for upload file every 3 seconds a time
+                        interval = setInterval(function () {
+                            intervalTime += 1;
+                            if (intervalTime > 5) {
+                                clearInterval(interval);
                             }
-                            if(currentFilePattern === 'audio') {
-                                fileName = $("[name='audioFile']#audioFileID").val().split('\\').pop();
-                            }
+                            if (object.successed) {
+                                var form = document.forms["uploadForm"];
+                                var fileName;
+                                if (currentFilePattern === 'firmware') {
+                                    fileName = $("[name='file']#fileID").val().split('\\').pop();
+                                }
+                                if (currentFilePattern === 'audio') {
+                                    fileName = $("[name='audioFile']#audioFileID").val().split('\\').pop();
+                                }
 
-                            console.log("fileName: "+fileName);
-                            $("#firmwareProgressBar").css("visibility", "visible");
-                            if (filesForm.files.length > 0) {
+                                console.log("fileName: " + fileName);
+                                $("#firmwareProgressBar").css("visibility", "visible");
+                                if (filesForm.files.length > 0) {
 
-                                // 寻找表单域中的 <input type="file" ... /> 标签
-                                var file = filesForm.files[0];
+                                    // 寻找表单域中的 <input type="file" ... /> 标签
+                                    var file = filesForm.files[0];
 
-                                //var formData = new FormData();
-                                //
-                                //for(var i=0;i<files.length;i++) {
-                                //  var file = files[i];
-                                //  formData.append(file.name, file);
-                                //}
+                                    //var formData = new FormData();
+                                    //
+                                    //for(var i=0;i<files.length;i++) {
+                                    //  var file = files[i];
+                                    //  formData.append(file.name, file);
+                                    //}
 
-                                var xhr = new XMLHttpRequest();
-                                (xhr.upload || xhr).addEventListener('progress', function (e) {
-                                    var done = e.position || e.loaded;
-                                    var total = e.totalSize || e.total;
-                                    if (total != 0 && !intervalIsClosed) {
-                                        console.log("clearInterval-------------------");
+                                    var xhr = new XMLHttpRequest();
+                                    (xhr.upload || xhr).addEventListener('progress', function (e) {
+                                        var done = e.position || e.loaded;
+                                        var total = e.totalSize || e.total;
+                                        if (total != 0 && !intervalIsClosed) {
+                                            console.log("clearInterval-------------------");
+                                            clearInterval(interval);
+                                            intervalIsClosed = true;
+                                        }
+                                        console.log('xhr progress: ' + Math.round(done / total * 100) + '%');
+                                        //example update the progress data
+                                        //$('#progress1').textContent = Math.round(done / total * 100) + '%';
+                                        document.getElementById('progress1').textContent = Math.round(done / total * 100) + '%';
+                                        if (done === total) {
+                                            document.getElementById('progress1').textContent = "Decompressing and installing";
+                                        }
+                                    });
+                                    // 请求完成时建立一个处理程序。
+                                    xhr.onload = function () {
+                                        canUpload = true;
+                                        console.log("update response status: " + xhr.status);
+                                        console.log("update response: " + xhr.response);
+                                        var object = JSON.parse(xhr.response);
+
+                                        $('#uploadBtn').removeClass('disabled');
+                                        $('#uploadAudioBtn').removeClass('disabled');
+
                                         clearInterval(interval);
-                                        intervalIsClosed = true;
-                                    }
-                                    console.log('xhr progress: ' + Math.round(done / total * 100) + '%');
-                                    //example update the progress data
-                                    //$('#progress1').textContent = Math.round(done / total * 100) + '%';
-                                    document.getElementById('progress1').textContent = Math.round(done / total * 100) + '%';
-                                    if (done === total) {
-                                        document.getElementById('progress1').textContent = "Decompressing and installing";
-                                    }
-                                });
-                                // 请求完成时建立一个处理程序。
-                                xhr.onload = function () {
-                                    console.log("update response status: " + xhr.status);
-                                    console.log("update response: " + xhr.response);
-                                    var object = JSON.parse(xhr.response);
-
-                                    $('#uploadBtn').removeClass('disabled');
-
-                                    clearInterval(interval);
-                                    if (object.successed) {
-                                        document.getElementById('progress1').textContent = "Update complete";
-                                        Materialize.toast("Update successfully", 4000);
-                                        Materialize.toast("If you want to use the updated features, please restart your robot.", 100000);
+                                        if (object.successed) {
+                                            document.getElementById('progress1').textContent = "Update complete";
+                                            Materialize.toast("Update successfully", 4000);
+                                            Materialize.toast("If you want to use the updated features, please restart your robot.", 10000);
+                                            $("#firmwareProgressBar").css("visibility", "hidden");
+                                            intervalIsClosed = false;
+                                            return false;
+                                        } else {
+                                            document.getElementById('progress1').textContent = "Update failed";
+                                            toastError("Update failed " + object.msg, 20000);
+                                            $("#firmwareProgressBar").css("visibility", "hidden");
+                                            console.log(xhr.response);
+                                            return false;
+                                        }
+                                    };
+                                    xhr.onerror = function () {
+                                        canUpload = true;
                                         $("#firmwareProgressBar").css("visibility", "hidden");
-                                        intervalIsClosed = false;
-                                        return false;
-                                    } else {
-                                        document.getElementById('progress1').textContent = "Update failed";
-                                        toastError("Update failed " + object.msg, 20000);
-                                        $("#firmwareProgressBar").css("visibility", "hidden");
-                                        console.log(xhr.response);
-                                        return false;
-                                    }
-                                };
-                                xhr.onerror = function () {
-                                    $("#firmwareProgressBar").css("visibility", "hidden");
-                                };
-                                console.log(uploadURL + file.name);
-                                xhr.open("POST", uploadURL + file.name);
-                                xhr.send(file);
-                            } else {
-                                alert("Please choose a file.");
-                                $("#uploadBtn").css("background-color", "#DFDFDF");
-                                $("#uploadBtn").css("color", "#9F9F9F");
+                                    };
+                                    console.log(uploadURL + file.name);
+                                    xhr.open("POST", uploadURL + file.name);
+                                    xhr.send(file);
+                                } else {
+                                    alert("Please choose a file.");
+                                    $("#uploadBtn").css("background-color", "#DFDFDF");
+                                    $("#uploadAudioBtn").css("background-color", "#DFDFDF");
+                                    $("#uploadBtn").css("color", "#9F9F9F");
+                                    $("#uploadAudioBtn").css("color", "#9F9F9F");
+                                }
                             }
-                        }
-                    }, 3000);
-                });
-            },
-            error: function (XMLHttpRequest, textStatus, errorThrown) {
-                console.log("check connection response: " + textStatus);
-                $("#firmwareProgressBar").css("visibility", "hidden");
-                if (textStatus == 'error') {
-                    toastError("Please connect to the robot WI-FI first!", 10000);
+                        }, 3000);
+                    });
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    canUpload = true;
+                    console.log("check connection response: " + textStatus);
+                    $('#uploadBtn').removeClass('disabled');
+                    $('#uploadAudioBtn').removeClass('disabled');
+
+                    $("#firmwareProgressBar").css("visibility", "hidden");
+                    if (textStatus == 'error') {
+                        toastError("Please connect to the robot WI-FI first!", 10000);
+                    }
                 }
-            }
-        });
+            });
+        }
     } else {
         $("#firmwareProgressBar").css("visibility", "hidden");
         toastError("You can't update now. Robot is not ready.");
@@ -639,7 +683,4 @@ if (codeBackEventSum === 0) {
     document.getElementById('backBtn').addEventListener('click', firmwareBack);
 }
 
-document.getElementById('resignIn').addEventListener('click', function () {
-    localStorage.removeItem("isSignedIn");
-    location.href = 'signIn.html';
-});
+document.getElement

@@ -9474,8 +9474,8 @@ select {
 }
 
 .preloader-wrapper.big {
-    width: 64px;
-    height: 64px
+    width: 80px;
+    height: 80px
 }
 
 .preloader-wrapper.active {

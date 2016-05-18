@@ -307,8 +307,20 @@ top:2px;
 }
 
 #download {
-    margin-left: 100px;
-    margin-top: 30px;
+    margin-left: 10px;
+    width:310px;
+}
+
+.blockTip {
+    margin-left: 10px;
+    color: #777777;
+    font-size: 14px;
+}
+
+.blockDivider {
+    height: 10px;
+    overflow: hidden;
+    background-color: #f7ecb5;
 }
 
 #mapDownload {
@@ -318,15 +330,23 @@ top:2px;
 
 #rollback {
     margin-left: 10px;
-    margin-top: 30px;
+    width:310px;
     /*margin-right: 20px;*/
 }
 
 #uploadBtn {
     margin-left: 10px;
-    margin-top: 30px;
+    /*margin-top: 30px;*/
     background-color: #DFDFDF;
     color: #9F9F9F;
+    width:310px;
+}
+
+#uploadAudioBtn {
+    margin-left: 10px;
+    background-color: #DFDFDF;
+    color: #9F9F9F;
+    width:310px;
 }
 
 #mapUploadBtn {
@@ -337,8 +357,9 @@ top:2px;
 }
 
 #chooseFileBtn {
-    margin-top: 30px;
+    /*margin-top: 30px;*/
     margin-left:10px;
+    width:310px;
 }
 
 #mapChooseFileBtn {
@@ -347,8 +368,8 @@ top:2px;
 }
 
 #chooseAudioFileBtn {
-    margin-top: 30px;
     margin-left:10px;
+    width:310px;
 }
 /*#backBtn {*/
 /*margin-top: 30px;*/
@@ -409,8 +430,8 @@ top:2px;
     position: absolute;
     z-index: 10;
     visibility: hidden;
-    margin-left: 10px;
-    margin-top: 30px
+    margin-left: 35em;
+    margin-top: 40px
 }
 
 .tips {

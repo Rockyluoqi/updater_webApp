@@ -15,6 +15,7 @@ var mapIsReachable = false;
 
 //read config json file named ipConfig.json using Node filesystem module
 function readConfig() {
+    localStorage.setItem('page', 'select');
     fs.readFile("./ipConfig.json","utf-8",function(error, fileData){
         console.log("error "+error);
         //save in localStorage for sharing the json data among javascript files.
@@ -45,7 +46,7 @@ function readConfig() {
                 $("#modelLabel").text(tempModel);
             }
             if(tempModel === 'GS-SR-01') {
-                $('#robotImage').attr('src','./css/icon/service-robot-deepBlue.png');
+                $('#robotImage').attr('src','./css/icon/service-robot-white.png');
                 $("#modelLabel").text(tempModel);
             }
         }
@@ -71,12 +72,15 @@ function saveChooseModel() {
         $('#robotImage').attr('src', './css/icon/robot-topdown-color-horizontal.png');
     }
     if(currentModel === 'GS-SR-01') {
-        $('#robotImage').attr('src','./css/icon/service-robot-deepBlue.png');
+        $('#robotImage').attr('src','./css/icon/service-robot-white.png');
     }
 
     var object = JSON.parse(localStorage.getItem('ipConfig'));
     localStorage.setItem('host',object[currentModel].host);
-    checkReachable();
+    console.log(object[currentModel].host);
+    if(localStorage.getItem('page') === 'select') {
+        checkReachable();
+    }
 }
 
 //create a model list in the modal
@@ -124,6 +128,7 @@ function checkReachable() {
 
     //remove all toasts which are not finished.
     $('.toast').remove();
+
     //check map updater module whether reachable
     isReachable(checkMapUpdaterURL, (err, reachable) => {
         if(reachable) {
@@ -133,7 +138,9 @@ function checkReachable() {
         } else {
             $("#mapModule").addClass("disabled");
             mapIsReachable = false;
-            document.getElementById('mapModule').removeEventListener('click',goMapModule);
+            if(mapBackEventSum) {
+                document.getElementById('mapModule').removeEventListener('click', goMapModule);
+            }
             document.getElementById('backBtn').removeEventListener('click',mapBack);
             document.getElementById('mapModule').href = "#";
             toastError("You can't migrate map now. <br/><br/> Please check the net connection and try again! <br/><br/> (Click the fresh button)", 10000);
