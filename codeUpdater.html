@@ -53,7 +53,7 @@
 <div class="content">
     <div class="action-area ch30">
         <!--<button class="button dh" id="download">Download</button>-->
-        <div style="width: 1500px;display: inline-block;position:relative">
+        <div style="display: inline-block;position:relative">
             <div class="preloader-wrapper big active" id="firmwareProgressBar">
                 <div class="spinner-layer spinner-blue">
                      <div class="circle-clipper left">
@@ -159,7 +159,7 @@
                 </div>
                 <div>
                     <p class="blockTip">Audio update</p>
-                    <a class="waves-effect waves-light btn-large blue tooltipped" id="chooseAudioFileBtn" data-position="bottom"
+                    <a class="waves-effect waves-light btn-large blue tooltipped disabled" id="chooseAudioFileBtn" data-position="bottom"
                        data-delay="50" data-tooltip="选择音频文件">choose audio
                         <i class="material-icons left" style="padding-top:8px;">
                             <svg fill="#FFFFFF" height="36" viewBox="0 0 24 24" width="36" xmlns="http://www.w3.org/2000/svg">
@@ -168,9 +168,9 @@
                             </svg>
                         </i>
                     </a>
-                    <a class="waves-effect waves-light btn-large tooltipped" id="uploadAudioBtn" data-position="bottom"
-                       data-delay="50" data-tooltip="将音频推送至机器人" href="#"
-                       onclick="document.getElementById('upload').click();return false;">push & update
+                    <a class="waves-effect waves-light btn-large tooltipped disabled" id="uploadAudioBtn" data-position="bottom"
+                       data-delay="50" data-tooltip="将音频推送至机器人">push & update
+                       <!--onclick="document.getElementById('upload').click();return false;">-->
                         <i class="material-icons left" style="padding-top:8px;">
                             <svg fill="#FFFFFF" height="36" viewBox="0 0 24 24" width="36" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M0 0h24v24H0z" fill="none"/>

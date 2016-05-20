@@ -115,15 +115,15 @@ function downloadFile(urlData, toast) {
 function showUpdateBtn() {
     $("#chooseFileBtn").css('visibility', 'visible');
     $("#chooseAudioFileBtn").css('visibility', 'visible');
-    $("#uploadBtn").css('visibility', 'visible');
-    $("#uploadAudioBtn").css('visibility', 'visible');
+    // $("#uploadBtn").css('visibility', 'visible');
+    // $("#uploadAudioBtn").css('visibility', 'visible');
 }
 
 function hideUpdateBtn() {
     $("#chooseFileBtn").css('visibility', 'hidden');
     $("#chooseAudioFileBtn").css('visibility', 'hidden');
-    $("#uploadBtn").css('visibility', 'hidden');
-    $("#uploadAudioBtn").css('visibility', 'hidden');
+    // $("#uploadBtn").css('visibility', 'hidden');
+    // $("#uploadAudioBtn").css('visibility', 'hidden');
 }
 
 //to decimal, save 2 digits
@@ -190,6 +190,7 @@ function downloadSubmit() {
         if (reachable) {
             download();
         } else {
+            showUpdateBtn();
             toastError("Please connect to the Internet first!");
             toastError(err);
         }
@@ -418,9 +419,9 @@ $('input[type=file]').change(function () {
     }
     if (filesForm.files.length > 0) {
         $("#uploadBtn").css("background-color", "#2196F3");
-        $("#uploadAudioBtn").css("background-color", "#2196F3");
+        // $("#uploadAudioBtn").css("background-color", "#2196F3");
         $("#uploadBtn").css("color", "#FFFFFF");
-        $("#uploadAudioBtn").css("color", "#FFFFFF");
+        // $("#uploadAudioBtn").css("color", "#FFFFFF");
         var files = filesForm.files;
         var ul = document.getElementById('listContainer');
 
@@ -464,11 +465,11 @@ document.getElementById("chooseFileBtn").addEventListener('click', function () {
     document.getElementById('fileID').click();
 });
 
-document.getElementById("chooseAudioFileBtn").addEventListener('click', function () {
-    currentModel = localStorage.getItem('currentModel');
-    currentFilePattern = 'audio';
-    document.getElementById('audioFileID').click();
-});
+// document.getElementById("chooseAudioFileBtn").addEventListener('click', function () {
+//     currentModel = localStorage.getItem('currentModel');
+//     currentFilePattern = 'audio';
+//     document.getElementById('audioFileID').click();
+// });
 
 //reserved function for canceling and deleting the uploading file
 function cancelChooseFile() {
@@ -490,7 +491,7 @@ function uploadAndSubmit() {
     var intervalTime;
     event.preventDefault();
     $('#uploadBtn').addClass('disabled');
-    $('#uploadAudioBtn').addClass('disabled');
+    // $('#uploadAudioBtn').addClass('disabled');
 
     currentModel = localStorage.getItem('currentModel');
     $("#firmwareProgressBar").css("visibility", "visible");
@@ -577,16 +578,18 @@ function uploadAndSubmit() {
                                         var object = JSON.parse(xhr.response);
 
                                         $('#uploadBtn').removeClass('disabled');
-                                        $('#uploadAudioBtn').removeClass('disabled');
+                                        // $('#uploadAudioBtn').removeClass('disabled');
 
                                         clearInterval(interval);
                                         if (object.successed) {
-                                            document.getElementById('progress1').textContent = "Update complete";
-                                            Materialize.toast("Update successfully", 4000);
-                                            Materialize.toast("If you want to use the updated features, please restart your robot.", 10000);
-                                            $("#firmwareProgressBar").css("visibility", "hidden");
-                                            intervalIsClosed = false;
-                                            return false;
+                                            setTimeout(function() {
+                                                document.getElementById('progress1').textContent = "Update complete";
+                                                Materialize.toast("Update successfully", 4000);
+                                                Materialize.toast("If you want to use the updated features, please restart your robot.", 10000);
+                                                $("#firmwareProgressBar").css("visibility", "hidden");
+                                                intervalIsClosed = false;
+                                                return false;
+                                            },60000);
                                         } else {
                                             document.getElementById('progress1').textContent = "Update failed";
                                             toastError("Update failed " + object.msg, 20000);
@@ -605,9 +608,9 @@ function uploadAndSubmit() {
                                 } else {
                                     alert("Please choose a file.");
                                     $("#uploadBtn").css("background-color", "#DFDFDF");
-                                    $("#uploadAudioBtn").css("background-color", "#DFDFDF");
+                                    // $("#uploadAudioBtn").css("background-color", "#DFDFDF");
                                     $("#uploadBtn").css("color", "#9F9F9F");
-                                    $("#uploadAudioBtn").css("color", "#9F9F9F");
+                                    // $("#uploadAudioBtn").css("color", "#9F9F9F");
                                 }
                             }
                         }, 3000);
@@ -617,7 +620,7 @@ function uploadAndSubmit() {
                     canUpload = true;
                     console.log("check connection response: " + textStatus);
                     $('#uploadBtn').removeClass('disabled');
-                    $('#uploadAudioBtn').removeClass('disabled');
+                    // $('#uploadAudioBtn').removeClass('disabled');
 
                     $("#firmwareProgressBar").css("visibility", "hidden");
                     if (textStatus == 'error') {

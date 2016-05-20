@@ -141,6 +141,8 @@ function checkReachable() {
             if(mapBackEventSum) {
                 document.getElementById('mapModule').removeEventListener('click', goMapModule);
             }
+            //risky change
+            document.getElementById('mapModule').removeEventListener('click', goMapModule);
             document.getElementById('backBtn').removeEventListener('click',mapBack);
             document.getElementById('mapModule').href = "#";
             toastError("You can't migrate map now. <br/><br/> Please check the net connection and try again! <br/><br/> (Click the fresh button)", 10000);
