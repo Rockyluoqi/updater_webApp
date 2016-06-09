@@ -18,7 +18,6 @@ app.on('ready',function() {
 		icon: './1463145149_wrench.png'
 	});
 	mainWindow.loadURL('file://' + __dirname +'/signIn.html');
-	mainWindow.openDevTools();
 	mainWindow.on('closed', function () {
 		mainWindow = null
 	});

@@ -14,6 +14,7 @@ var mapUploadURL = host + ":8088/gs-robot/data/upload_map";
 var getMapListURL = host + ":8080/gs-robot/data/maps";
 var mapBeginURL = host + ":8080/gs-robot/cmd/launch_map_loader";
 var mapOverURL = host + ":8080/gs-robot/cmd/shutdown_map_loader";
+var noticeReloadUrl = host + ":8080/gs-robot/cmd/load_map_cache";
 var hostname = host.split('/')[2];
 var mapList = [];
 
@@ -234,6 +235,17 @@ function mapUploadAndSubmit() {
              */
             upload(files[i], i);
         }
+        // TODO(twx):notice server to reload cache
+        setTimeout(function() {
+          $.ajax({
+              url: noticeReloadUrl,
+              type: "GET",
+              success: function (data) {
+                  console.log("notice reload successed: " + data);
+              }
+          });
+        },5000);
+
     } else {
         alert("Please choose a file.");
         $("#mapUploadBtn").css("background-color", "#DFDFDF");

@@ -1,18 +1,20 @@
 {
-  "GS_AS_01": {
-    "model":"GS_AS_01",
-    "host":"http://192.168.1.107",
+  "GS-AS-01": {
+    "model":"GS-AS-01",
+    "host":"http://192.168.1.88",
     "start_updater_api": ":5678/gs-robot/cmd/launch_system_updater",
     "stop_updater_api": ":5678/gs-robot/cmd/shutdown_system_updater",
     "update_api": ":6789/gs-robot/system/update_system/",
-    "rollback_api": "6789/gs-robot/system/rollback"
+    "update_audio_api": ":6789/gs-robot/system/update_audio/",
+    "rollback_api": ":6789/gs-robot/system/rollback"
   },
   "GS_SR_01":{
-    "model":"GS_SR_01",
-    "host":"http://192.168.1.88",
+    "model":"GS-SR-01",
+    "host":"http://10.7.5.88",
     "start_updater_api": ":8080/gs-robot/cmd/launch_system_updater",
     "stop_updater_api": ":8080/gs-robot/cmd/shutdown_system_updater",
     "update_api": ":6789/gs-robot/system/update_system/",
+    "update_audio_api": ":6789/gs-robot/system/update_audio/",
     "rollback_api": ":6789/gs-robot/system/rollback"
   }
 }

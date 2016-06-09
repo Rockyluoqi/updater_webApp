@@ -28,3 +28,14 @@ describe('application launch', function () {
         })
     })
 });
+
+describe('ServerTest', function(){
+    it('should respond to GET',function(done){
+        superagent
+            .get('http://XXXX/XXXX/'+port)
+            .end(function(res){
+                expect(res.status).to.equal(200);
+                done()
+            })
+    })
+});
